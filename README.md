@@ -1,5 +1,7 @@
 # byuwur/easy-code-viewer
 
+![easy-code-viewer preview](prev.jpg)
+
 **Code, let syntax speak.**
 
 Display source with syntax highlighting, language selection, line numbers, wrapping, and copy controls.
@@ -208,7 +210,7 @@ node --check code.js
 node --test tests/rendering.cjs
 ```
 
-`BROWSER_CHANNEL=chrome` uses installed Chrome; `CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable. Otherwise, install Playwright Chromium.
+`BROWSER_CHANNEL=chrome` uses installed Chrome; `CHROMIUM_EXECUTABLE_PATH` selects a Chromium executable. Otherwise, install Playwright Chromium. [GitHub Actions](.github/workflows/rendering.yml) runs the same suite.
 
 ## The easy viewers
 
