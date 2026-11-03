@@ -101,9 +101,11 @@ Customize `--by-code-comment`, `--by-code-keyword`, `--by-code-string`, `--by-co
 
 ## Optional Markdown integration contract
 
-`easy-md-viewer` has no automatic highlighting or `codeHighlighting` option. For manual integration, check `typeof window.byCODEviewer?.highlight === "function"`, then pass each fence's original source and language to `highlight()`. Insert its fragment into the existing `<pre><code>`, load `code.css`, and match the wrapper theme to the document. Keep the original text if the library is absent or highlighting fails. Process fenced blocks separately from inline code.
+Load `code.js` and `code.css` alongside `md.js` and `md.css` before rendering. [easy-md-viewer](https://github.com/byuwur/easy-md-viewer) uses `highlight()` for fenced blocks by default when available. Fence labels select the language; inline code stays plain. Use `{ codeHighlighting: false }` in the Markdown options to disable it.
 
-Use the fragment API instead of the full viewer to avoid nested toolbars and line numbers. Load the library before calling it. The same API works in other host pages; it adds no shared runtime state or mandatory dependency. No other viewer loads it automatically.
+Fragments inherit Markdown's palette, Light/Dark mode, and custom `--by-code-*` colors, including High Contrast. No nested toolbars or line numbers are created. Highlighting errors leave the original fence text intact, and Markdown works independently when this library is absent.
+
+For other host pages, call `highlight(source, language)` and insert its fragment into your existing `<pre><code>`. The fragment API adds no controls or shared runtime state. No other viewer loads this library automatically.
 
 ## Shared controls and lifecycle
 

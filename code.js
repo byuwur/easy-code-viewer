@@ -767,7 +767,7 @@
   }
 
   global.byCODEviewer = byCODEviewer;
-  byCODEviewer.VERSION = "1";
+  byCODEviewer.VERSION = "1.1";
   byCODEviewer.initialized = true;
   byCODEviewer.languages = languages;
   byCODEviewer.highlight = (source, language = "plain") => {
