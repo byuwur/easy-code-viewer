@@ -567,7 +567,9 @@
 .byCODEdocument button {
   -webkit-tap-highlight-color: transparent;
   touch-action: manipulation;
-  transition: background-color 0.15s, box-shadow 0.15s;
+  transition:
+    background-color 0.15s,
+    box-shadow 0.15s;
 }
 .byCODEdocument button:not(:disabled):hover {
   background: color-mix(in srgb, currentColor 7%, var(--by-view-bg));

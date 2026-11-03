@@ -29,9 +29,7 @@
   const appendThemeToggle = (element, controls, filename) => {
     const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
     const themePattern = new RegExp(`^([^?#]*/)?${escapedFilename}\\.(light|dark)\\.css([?#].*)?$`, "i");
-    const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find(
-      (link) => link && themePattern.test(link.getAttribute("href") || "")
-    );
+    const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => link && themePattern.test(link.getAttribute("href") || ""));
     // Explicit container state takes precedence over a shared legacy stylesheet.
     const localTheme = (target) => {
       if (["light", "dark"].includes(target.dataset.theme)) return target.dataset.theme;
@@ -44,11 +42,11 @@
     const button = document.createElement("button");
     button.type = "button";
     button.className = "byVIEWthemeToggle";
-    button.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
+    button.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
     const sync = () => {
       const next = getTheme() === "dark" ? "light" : "dark";
-      const toggles =
-        !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byCODEdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
+      const toggles = !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byCODEdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
       for (const toggle of toggles) {
         // A legacy link must not change the controls of independently themed viewers.
         if (toggle !== button && localTheme(toggle.closest(".byCODEdocument"))) continue;
@@ -461,10 +459,7 @@
         if (i > piece) yield token("string", source.slice(piece, i));
         canRegex = false;
         continue;
-      } else if (
-        (char === '"' || char === "'" || (char === "`" && ["php", "bash", "sql", "javascript", "typescript"].includes(language))) &&
-        (language !== "yaml" || i === 0 || /[\s:[{,?\-]/.test(source[i - 1]))
-      ) {
+      } else if ((char === '"' || char === "'" || (char === "`" && ["php", "bash", "sql", "javascript", "typescript"].includes(language))) && (language !== "yaml" || i === 0 || /[\s:[{,?\-]/.test(source[i - 1]))) {
         type = language === "sql" && char !== "'" ? "property" : "string";
         i = quotedEnd(source, i, end, language);
         if (["json", "yaml"].includes(language) && /^\s*:/.test(source.slice(i))) type = "property";

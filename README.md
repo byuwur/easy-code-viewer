@@ -25,7 +25,9 @@ Open `index.html` for the local playground; its page assets require internet acc
 <script>
   document.addEventListener("DOMContentLoaded", () => {
     byCODEviewer(document.getElementById("viewer"), 'const greeting = "Hello";', {
-      language: "javascript", lineNumbers: true, wordWrap: true
+      language: "javascript",
+      lineNumbers: true,
+      wordWrap: true
     });
   });
 </script>
@@ -63,12 +65,12 @@ code.replaceChildren(fragment);
 
 ## Code options
 
-| Option | Default | Behavior |
-| --- | --- | --- |
-| `language` | `"plain"` | Canonical name or alias from the tables below. Unsupported names use plain. |
-| `languageSelect` | `false` | Show a language selector. Changing it supersedes unfinished rendering. |
-| `lineNumbers` | `true` | Show a separate, non-copying line-number gutter. |
-| `wordWrap` | `true` | Wrap long lines; `false` keeps horizontal scrolling inside the viewer. |
+| Option           | Default   | Behavior                                                                    |
+| ---------------- | --------- | --------------------------------------------------------------------------- |
+| `language`       | `"plain"` | Canonical name or alias from the tables below. Unsupported names use plain. |
+| `languageSelect` | `false`   | Show a language selector. Changing it supersedes unfinished rendering.      |
+| `lineNumbers`    | `true`    | Show a separate, non-copying line-number gutter.                            |
+| `wordWrap`       | `true`    | Wrap long lines; `false` keeps horizontal scrolling inside the viewer.      |
 
 ## Stateful highlighting architecture
 
@@ -103,18 +105,18 @@ Use the fragment API instead of the full viewer to avoid nested toolbars and lin
 
 ## Shared controls and lifecycle
 
-| Option | Default | Behavior |
-| --- | --- | --- |
-| `toolbar` | `true` | Show the viewer header; secondary tools are configured separately. |
-| `credits` | `true` | Show attribution in the header. |
-| `statusBar` | `true` | Show counts and metadata. Loading, errors, and empty results remain visible. |
-| `wrapControl` | `false` | Show the word-wrap switch; wordWrap also works without it. |
-| `themeToggle` | `true` | Show the theme toggle. |
-| `fontSizeControls` | `true` | Show text-size controls. |
-| `copyButton` | `true` | Show full source copy button. |
-| `controlsSize` | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`. |
-| `controlsCompact` | `true` | Keep credits beside controls; `false` stacks them. Wraps as needed. |
-| `controlsPosition` | `"top"` | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`. |
+| Option             | Default     | Behavior                                                                     |
+| ------------------ | ----------- | ---------------------------------------------------------------------------- |
+| `toolbar`          | `true`      | Show the viewer header; secondary tools are configured separately.           |
+| `credits`          | `true`      | Show attribution in the header.                                              |
+| `statusBar`        | `true`      | Show counts and metadata. Loading, errors, and empty results remain visible. |
+| `wrapControl`      | `false`     | Show the word-wrap switch; wordWrap also works without it.                   |
+| `themeToggle`      | `true`      | Show the theme toggle.                                                       |
+| `fontSizeControls` | `true`      | Show text-size controls.                                                     |
+| `copyButton`       | `true`      | Show full source copy button.                                                |
+| `controlsSize`     | `"regular"` | `"small"`, `"regular"`, or `"large"`; invalid values use `"regular"`.        |
+| `controlsCompact`  | `true`      | Keep credits beside controls; `false` stacks them. Wraps as needed.          |
+| `controlsPosition` | `"top"`     | Sticky `"top"` or `"bottom"` toolbar; invalid values use `"top"`.            |
 
 The controller exposes `ready` and `destroy()`. `ready` resolves `true` after initial rendering, or `false` on a displayed data error or cancellation. Invalid targets/options can throw synchronously.
 
@@ -136,12 +138,12 @@ Controls use monospace by default; override `--by-view-controls-font` to change 
 
 `code.css` includes all palettes in Light and Dark. Monokai is the default.
 
-| Palette | `data-theme` | What it looks like |
-| --- | --- | --- |
-| Monokai (default) | `monokai` | Warm light and dark colors. |
-| GitHub | `github` | Familiar neutral surfaces and syntax colors. |
-| Solarized | `solarized` | Warm light or deep blue-green dark surfaces. |
-| High Contrast | `high-contrast` | Black/white surfaces, strong text, borders, and focus indicators. |
+| Palette           | `data-theme`    | What it looks like                                                |
+| ----------------- | --------------- | ----------------------------------------------------------------- |
+| Monokai (default) | `monokai`       | Warm light and dark colors.                                       |
+| GitHub            | `github`        | Familiar neutral surfaces and syntax colors.                      |
+| Solarized         | `solarized`     | Warm light or deep blue-green dark surfaces.                      |
+| High Contrast     | `high-contrast` | Black/white surfaces, strong text, borders, and focus indicators. |
 
 Use a mode class and a palette name together:
 
