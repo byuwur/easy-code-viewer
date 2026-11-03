@@ -670,6 +670,8 @@
     else parent.appendChild(node("span", `byCODEtoken byCODE${part.type}`, text));
   };
 
+  const codeStatus = (source, language, count) => (!source.length ? "No source code." : `${language} \u00b7 ${count} ${count === 1 ? "line" : "lines"}`);
+
   /** Stateful lexical highlighting; source is never interpreted as HTML or executed. */
   /* --- PUBLIC API --- */
   function byCODEviewer(element, source, options = {}) {
@@ -750,7 +752,7 @@
         lines.style.setProperty("--by-code-line-digits", String(Math.max(2, String(lineNumber).length)));
         lines.replaceChildren(fragment);
         status.hidden = options.statusBar === false && source.length > 0;
-        status.textContent = !source.length ? "No source code." : `${language} · ${lineNumber} lines`;
+        status.textContent = codeStatus(source, language, lineNumber);
         element.setAttribute("aria-busy", "false");
         return true;
       } catch (error) {
@@ -770,10 +772,53 @@
   byCODEviewer.VERSION = "1.1";
   byCODEviewer.initialized = true;
   byCODEviewer.languages = languages;
-  byCODEviewer.highlight = (source, language = "plain") => {
+  /** Optional code-block presentation preserves the fragment's exact source text. */
+  byCODEviewer.highlight = (source, language = "plain", options = {}) => {
     const fragment = document.createDocumentFragment(),
-      wrapper = node("span", "byCODEhighlight");
-    for (const part of tokenize(source, language)) appendToken(wrapper, part);
+      wrapper = node("span", "byCODEhighlight"),
+      tokens = tokenize(source, options.highlighting === false ? "plain" : language);
+    if (!options.lineNumbers && !options.statusBar) {
+      for (const part of tokens) appendToken(wrapper, part);
+    } else {
+      wrapper.classList.add("byCODEblock");
+      const lines = node("span", "byCODElines");
+      let count = 0,
+        text;
+      const newLine = () => {
+        const line = node("span", "byCODEline");
+        count += 1;
+        if (options.lineNumbers) {
+          const number = node("span", "byCODElineNumber");
+          number.dataset.line = String(count);
+          number.setAttribute("aria-hidden", "true");
+          line.appendChild(number);
+        }
+        text = node("span", "byCODEtext");
+        line.appendChild(text);
+        lines.appendChild(line);
+      };
+      newLine();
+      for (const part of tokens) {
+        for (const piece of part.text.split(/(\r?\n)/)) {
+          if (piece === "\n" || piece === "\r\n") {
+            // Keep original separators outside the visual rows for exact textContent.
+            lines.appendChild(document.createTextNode(piece));
+            newLine();
+          } else if (piece) appendToken(text, part, piece);
+        }
+      }
+      lines.style.setProperty("--by-code-line-digits", String(Math.max(2, String(count).length)));
+      const label = codeStatus(source, languageName(language), count);
+      wrapper.setAttribute("role", "region");
+      wrapper.setAttribute("aria-label", label);
+      if (options.statusBar) {
+        const status = node("span", "byCODEstatus");
+        status.dataset.label = label;
+        status.setAttribute("aria-hidden", "true");
+        wrapper.appendChild(status);
+      }
+      wrapper.appendChild(lines);
+    }
     fragment.appendChild(wrapper);
     return fragment;
   };

@@ -105,6 +105,86 @@ test("CODE standalone browser contracts", async (t) => {
       assert.deepEqual(result, { exact: true, kind: true, safe: true, injected: false, styles: false, theme: "#e6db74" });
       await isolated.close();
     });
+    await t.test("framed fragments preserve source, independent options, and lexical context", async () => {
+      const isolated = await browser.newPage({ viewport: { width: 320, height: 640 } });
+      try {
+        await isolated.addStyleTag({ path: path.join(__dirname, "../code.css") });
+        await isolated.addScriptTag({ path: path.join(__dirname, "../code.js") });
+        const result = await isolated.evaluate(() => {
+          const source = '/* first\r\nsecond */\r\n\r\nconst text = `first\r\nsecond`;\r\n';
+          const cases = [];
+          for (const lineNumbers of [false, true]) {
+            for (const statusBar of [false, true]) {
+              const fragment = byCODEviewer.highlight(source, "js", { lineNumbers, statusBar });
+              const wrapper = fragment.firstElementChild;
+              cases.push({
+                exact: fragment.textContent === source,
+                framed: wrapper.classList.contains("byCODEblock"),
+                lines: wrapper.querySelectorAll(".byCODEline").length,
+                numbers: [...wrapper.querySelectorAll(".byCODElineNumber")].map((number) => [number.dataset.line, number.textContent, number.getAttribute("aria-hidden")]),
+                status: wrapper.querySelector(".byCODEstatus")?.dataset.label ?? null,
+                comments: [...wrapper.querySelectorAll(".byCODEcomment")].map((token) => token.textContent).join("").replace(/\r\n/g, ""),
+                strings: [...wrapper.querySelectorAll(".byCODEstring")].map((token) => token.textContent).join("").replace(/\r\n/g, "")
+              });
+            }
+          }
+          const empty = byCODEviewer.highlight("", "js", { statusBar: true });
+          const plain = byCODEviewer.highlight("const value = 1;", "js", { highlighting: false, statusBar: true });
+          const host = document.createElement("pre");
+          host.style.cssText = "margin:0;max-width:100%;--by-view-bg:#123456;--by-code-keyword:#abcdef";
+          host.append(byCODEviewer.highlight(Array.from({ length: 101 }, () => "const " + "long".repeat(40)).join("\n"), "js", { lineNumbers: true, statusBar: true }));
+          document.body.append(host);
+          const block = host.firstElementChild;
+          const sizes = [1, 1.5].map((scale) => {
+            host.style.fontSize = `${scale}rem`;
+            const rows = [...host.querySelectorAll(".byCODEline")];
+            return {
+              contained: document.documentElement.scrollWidth <= innerWidth,
+              overflow: block.scrollWidth > block.clientWidth,
+              continuous: rows.slice(1).every((row, index) => Math.abs(row.getBoundingClientRect().top - rows[index].getBoundingClientRect().bottom) < 0.1),
+              numberWidth: host.querySelector(".byCODElineNumber").getBoundingClientRect().width,
+              digits: host.querySelector(".byCODElines").style.getPropertyValue("--by-code-line-digits")
+            };
+          });
+          const inherited = [getComputedStyle(block).backgroundColor, getComputedStyle(block.querySelector(".byCODEkeyword")).color];
+          block.classList.add("dark");
+          block.dataset.theme = "high-contrast";
+          return {
+            cases,
+            empty: [empty.textContent, empty.querySelectorAll(".byCODEline").length, empty.querySelector(".byCODEstatus").dataset.label],
+            plain: [plain.textContent, plain.querySelectorAll(".byCODEtoken").length, plain.querySelector(".byCODEstatus").dataset.label],
+            controls: host.querySelectorAll(".byCODEdocument, .byVIEWtoolbar, button, input, select").length,
+            sizes,
+            inherited,
+            explicit: [getComputedStyle(block).backgroundColor, getComputedStyle(block.querySelector(".byCODEkeyword")).color]
+          };
+        });
+        for (const [index, entry] of result.cases.entries()) {
+          const numbered = index >= 2, status = index % 2 === 1;
+          assert.equal(entry.exact, true);
+          assert.equal(entry.framed, numbered || status);
+          assert.equal(entry.lines, numbered || status ? 6 : 0);
+          assert.deepEqual(entry.numbers, numbered ? Array.from({ length: 6 }, (_, i) => [String(i + 1), "", "true"]) : []);
+          assert.equal(entry.status, status ? "javascript · 6 lines" : null);
+          assert.equal(entry.comments, "/* firstsecond */");
+          assert.equal(entry.strings, "`firstsecond`");
+        }
+        assert.deepEqual(result.empty, ["", 1, "No source code."]);
+        assert.deepEqual(result.plain, ["const value = 1;", 0, "javascript · 1 line"]);
+        assert.equal(result.controls, 0);
+        assert.deepEqual(result.inherited, ["rgb(18, 52, 86)", "rgb(171, 205, 239)"]);
+        assert.deepEqual(result.explicit, ["rgb(0, 0, 0)", "rgb(255, 181, 255)"]);
+        for (const size of result.sizes) {
+          assert.equal(size.contained, true);
+          assert.equal(size.overflow, true);
+          assert.equal(size.continuous, true);
+          assert.equal(size.digits, "3");
+        }
+        assert.ok(result.sizes[1].numberWidth > result.sizes[0].numberWidth);
+      } finally {
+        await isolated.close();
+      }
+    });
     await t.test("web grammars keep strings/comments separate and retain template context", async () => {
       const result = await page.evaluate(() => {
         const js = byCODEviewer.highlight('const text = "if // return"; /* class */\nconst r = /a[\\/]b/g; const t = `hello ${name + `${2}`}`;', "javascript");
