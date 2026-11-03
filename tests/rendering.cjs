@@ -992,3 +992,45 @@ test("viewer defaults, optional tools, and copy feedback", async () => {
     await browser.close();
   }
 });
+
+
+test("highlight fragments inherit arbitrary hosts and retain standalone and explicit themes", async () => {
+  const browser = await chromium.launch({ channel: process.env.BROWSER_CHANNEL || undefined, executablePath: process.env.CHROMIUM_EXECUTABLE_PATH || undefined });
+  try {
+    const page = await browser.newPage();
+    await page.setContent('<section id="host"><pre><code id="inherited"></code><code id="explicit"></code><code id="light"></code><code id="monokai"></code></pre></section><pre id="standalone"></pre><aside id="partial"></aside><div id="outside">Host text</div>');
+    await page.addStyleTag({ path: path.join(__dirname, "../code.css") });
+    await page.addScriptTag({ path: path.join(__dirname, "../code.js") });
+    await page.evaluate(() => {
+      const names = ["comment", "keyword", "string", "number", "property", "tag"];
+      const colors = ["#102030", "#203040", "#304050", "#405060", "#506070", "#607080"];
+      names.forEach((name, index) => document.getElementById("host").style.setProperty("--by-code-" + name, colors[index]));
+      document.getElementById("partial").style.setProperty("--by-code-keyword", "#123456");
+      for (const id of ["inherited", "explicit", "light", "monokai", "standalone", "partial"]) {
+        const fragment = byCODEviewer.highlight('<div class="note"><script>const n = 42; // note\n</script></div>', "html");
+        if (id === "explicit") { fragment.firstElementChild.dataset.theme = "github"; fragment.firstElementChild.classList.add("dark"); }
+        if (id === "light") fragment.firstElementChild.classList.add("light");
+        if (id === "monokai") fragment.firstElementChild.dataset.theme = "monokai";
+        document.getElementById(id).append(fragment);
+      }
+      window.fragmentColors = (id) => names.map((name) => getComputedStyle(document.querySelector("#" + id + " .byCODE" + (name === "property" ? "attribute" : name))).color);
+    });
+    const light = ["rgb(116, 116, 97)", "rgb(183, 25, 86)", "rgb(100, 125, 0)", "rgb(124, 66, 181)", "rgb(153, 97, 24)", "rgb(183, 25, 86)"];
+    assert.deepEqual(await page.evaluate(() => fragmentColors("standalone")), light);
+    assert.deepEqual(await page.evaluate(() => fragmentColors("inherited")), ["rgb(16, 32, 48)", "rgb(32, 48, 64)", "rgb(48, 64, 80)", "rgb(64, 80, 96)", "rgb(80, 96, 112)", "rgb(96, 112, 128)"]);
+    assert.deepEqual(await page.evaluate(() => fragmentColors("partial")), light.map((color, index) => index === 1 ? "rgb(18, 52, 86)" : color));
+    assert.deepEqual(await page.evaluate(() => fragmentColors("explicit")), ["rgb(145, 152, 161)", "rgb(255, 123, 114)", "rgb(165, 214, 255)", "rgb(121, 192, 255)", "rgb(255, 166, 87)", "rgb(126, 231, 135)"]);
+    assert.deepEqual(await page.evaluate(() => fragmentColors("light")), light);
+    assert.deepEqual(await page.evaluate(() => fragmentColors("monokai")), light);
+    await page.locator("#host").evaluate((host) => host.style.setProperty("--by-code-keyword", "#abcdef"));
+    assert.equal(await page.evaluate(() => fragmentColors("inherited")[1]), "rgb(171, 205, 239)");
+    assert.equal(await page.evaluate(() => fragmentColors("explicit")[1]), "rgb(255, 123, 114)");
+    await page.locator("#inherited .byCODEhighlight").evaluate((fragment) => fragment.style.setProperty("--by-code-string", "#fedcba"));
+    assert.equal(await page.evaluate(() => fragmentColors("inherited")[2]), "rgb(254, 220, 186)");
+    await page.locator("#inherited .byCODEhighlight").evaluate((fragment) => document.getElementById("partial").replaceChildren(fragment));
+    assert.equal(await page.evaluate(() => fragmentColors("partial")[1]), "rgb(18, 52, 86)");
+    assert.equal(await page.locator("#outside").evaluate((element) => getComputedStyle(element).getPropertyValue("--by-code-keyword")), "");
+  } finally {
+    await browser.close();
+  }
+});

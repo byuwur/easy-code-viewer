@@ -23,7 +23,7 @@
 .byCODEdocument,
 .byCODEdocument.light:not([data-theme="dark"]),
 .byCODEdocument[data-theme="light"],
-.byCODEhighlight,
+.byCODEhighlight[data-theme="monokai"]:not(.dark),
 .byCODEhighlight.light:not([data-theme="dark"]),
 .byCODEhighlight[data-theme="light"] {
   --by-code-comment: #747461;
@@ -253,15 +253,6 @@
 
 /* --- CONTENT --- */
 
-/* Embedded highlights inherit their viewer; standalone fragments may choose a theme. */
-:where(.byCODEdocument) .byCODEhighlight {
-  --by-code-comment: inherit;
-  --by-code-keyword: inherit;
-  --by-code-string: inherit;
-  --by-code-number: inherit;
-  --by-code-property: inherit;
-  --by-code-tag: inherit;
-}
 .byCODEdocument *,
 .byCODEdocument *::before,
 .byCODEdocument *::after {
@@ -359,24 +350,25 @@
   white-space: pre-wrap;
   overflow-wrap: anywhere;
 }
+/* Unthemed fragments inherit any host's syntax variables; missing colors use Monokai Light. */
 :is(.byCODEdocument, .byCODEhighlight) .byCODEcomment {
-  color: var(--by-code-comment);
+  color: var(--by-code-comment, #747461);
   font-style: italic;
 }
 :is(.byCODEdocument, .byCODEhighlight) :is(.byCODEkeyword, .byCODEliteral) {
-  color: var(--by-code-keyword);
+  color: var(--by-code-keyword, #b71956);
 }
 :is(.byCODEdocument, .byCODEhighlight) :is(.byCODEstring, .byCODEregex) {
-  color: var(--by-code-string);
+  color: var(--by-code-string, #647d00);
 }
 :is(.byCODEdocument, .byCODEhighlight) .byCODEnumber {
-  color: var(--by-code-number);
+  color: var(--by-code-number, #7c42b5);
 }
 :is(.byCODEdocument, .byCODEhighlight) :is(.byCODEproperty, .byCODEattribute, .byCODEvariable, .byCODEfunction) {
-  color: var(--by-code-property);
+  color: var(--by-code-property, #996118);
 }
 :is(.byCODEdocument, .byCODEhighlight) .byCODEtag {
-  color: var(--by-code-tag);
+  color: var(--by-code-tag, #b71956);
 }
 .byCODEdocument .byVIEWpanel {
   min-width: 0;

@@ -50,7 +50,9 @@ Exported HTML starters use default settings, independently of playground changes
 
 `byCODEviewer.highlight(source, language = "plain")` synchronously returns a `DocumentFragment` with one `.byCODEhighlight` wrapper. Its textContent exactly preserves the source, including whitespace and CRLF. It creates no controls, changes no caller DOM, and never evaluates input.
 
-Load `code.css` to style fragments, even without a viewer instance. Use `.light` / `.dark` with a named `data-theme` on the returned wrapper, just like a full viewer. The `data-theme="light"` / `"dark"` aliases also work.
+Load `code.css` to style fragments, even without a viewer instance. Unthemed fragments inherit `--by-code-*` colors from any container; missing colors use Monokai Light.
+
+For an explicit palette, use `.light` / `.dark` with a named `data-theme` on the returned wrapper, just like a full viewer. This overrides inherited colors. The `data-theme="light"` / `"dark"` aliases also work.
 
 Invalid source/size throws `TypeError`/`RangeError` before returning a fragment. Unsupported languages use plain text.
 
