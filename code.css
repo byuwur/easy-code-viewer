@@ -252,7 +252,7 @@
   padding: 0 1rem 1.5rem;
   border: 0.0625rem solid var(--by-view-border);
   border-radius: var(--by-view-radius, 0.75rem);
-  background: var(--by-view-bg);
+  background: var(--by-view-document-bg, var(--by-view-bg));
   color: var(--by-view-text);
   font:
     1rem/1.4 system-ui,
@@ -281,7 +281,7 @@
   padding: 0.25em 0.5em;
   border: 0.0625rem solid var(--by-view-border);
   border-radius: var(--by-view-radius, 0.65em);
-  background: var(--by-view-bg);
+  background: var(--by-view-container-bg, var(--by-view-bg));
   color: inherit;
   font: inherit;
 }
@@ -341,7 +341,7 @@
   flex: 0 0 calc(var(--by-code-line-digits, 3) * 1ch + 1.25em + 0.0625rem);
   padding: 0 0.625em;
   border-right: 0.0625rem solid color-mix(in srgb, var(--by-view-border, #d8d8c8) 50%, transparent);
-  background: color-mix(in srgb, var(--by-view-alt, #eeeee4) 40%, var(--by-view-bg, #fafaf5));
+  background: color-mix(in srgb, var(--by-view-alt, #eeeee4) 40%, var(--by-view-container-bg, var(--by-view-bg, #fafaf5)));
   text-align: right;
   white-space: nowrap;
   color: var(--by-view-secondary, #686856);
@@ -368,7 +368,7 @@
   overflow: auto;
   border: 0.0625rem solid var(--by-view-border, #d8d8c8);
   border-radius: var(--by-view-radius, 0.65em);
-  background: var(--by-view-bg, #fafaf5);
+  background: var(--by-view-container-bg, var(--by-view-bg, #fafaf5));
   color: var(--by-view-text, inherit);
   white-space: normal;
 }
@@ -382,7 +382,7 @@
   display: block;
   padding: 0.375em 0.625em;
   border-bottom: 0.0625rem solid var(--by-view-border, #d8d8c8);
-  background: var(--by-view-alt, #eeeee4);
+  background: var(--by-view-container-bg, var(--by-view-alt, #eeeee4));
   color: var(--by-view-secondary, #686856);
   font: 0.95em/1.4 system-ui, sans-serif;
 }
@@ -419,12 +419,13 @@
   overflow: hidden;
   border: 0.0625rem solid var(--by-view-border);
   border-radius: var(--by-view-radius, 0.65em);
+  background: var(--by-view-container-bg, var(--by-view-bg));
 }
 .byCODEdocument .byVIEWpanel > .byVIEWstatus {
   margin: 0;
   padding: 0.375em 0.625em;
   border-bottom: 0.0625rem solid var(--by-view-border);
-  background: var(--by-view-alt);
+  background: var(--by-view-container-bg, var(--by-view-alt));
 }
 .byCODEdocument .byVIEWpanel > :focus-visible {
   outline-offset: -0.125rem;
@@ -442,7 +443,7 @@
   gap: 0.25em;
   margin: 0;
   padding: 0.5rem 0;
-  background: var(--by-view-bg);
+  background: transparent;
   font: 0.875rem/1.25 var(--by-view-controls-font, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace);
   white-space: normal;
 }
@@ -471,6 +472,7 @@
   flex-wrap: wrap-reverse;
 }
 .byCODEdocument > .byVIEWtoolbar .byVIEWinfo {
+  background: transparent;
   max-width: 100%;
   color: var(--by-view-muted);
   opacity: 0.25;
@@ -512,7 +514,7 @@
   padding: 0.25em 0.5em;
   border: 0.0625rem solid var(--by-view-border);
   border-radius: var(--by-view-radius, 0.65em);
-  background: transparent;
+  background: var(--by-view-container-bg, var(--by-view-bg));
   color: inherit;
   font: inherit;
   line-height: 1;
@@ -607,10 +609,10 @@
     box-shadow 0.15s;
 }
 .byCODEdocument button:not(:disabled):hover {
-  background: color-mix(in srgb, currentColor 7%, var(--by-view-bg));
+  background: color-mix(in srgb, currentColor 7%, var(--by-view-container-bg, var(--by-view-bg)));
 }
 .byCODEdocument button:not(:disabled):active {
-  background: color-mix(in srgb, currentColor 13%, var(--by-view-bg));
+  background: color-mix(in srgb, currentColor 13%, var(--by-view-container-bg, var(--by-view-bg)));
 }
 .byCODEdocument button:focus-visible {
   outline: 0.125rem solid var(--by-view-accent);
