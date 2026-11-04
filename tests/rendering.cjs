@@ -621,7 +621,7 @@ test("family customization, navigation and monospace controls", async () => {
         .then((labels) => labels.map((label) => label.trim()).slice(0, 3)),
       ["Preview appearance", "Viewer controls", "Rendering"]
     );
-    assert.deepEqual(await page.locator("#options-json").evaluate((editor) => Object.keys(JSON.parse(editor.value)).slice(0, 17)), [
+    assert.deepEqual(await page.locator("#options-json").evaluate((editor) => Object.keys(JSON.parse(editor.value)).slice(0, 18)), [
       "theme",
       "palette",
       "fontFamily",
@@ -629,6 +629,7 @@ test("family customization, navigation and monospace controls", async () => {
       "lineHeight",
       "controlsFont",
       "backgroundColor",
+      "containerBackgroundColor",
       "textColor",
       "customThemeCSS",
       "toolbar",
@@ -707,7 +708,7 @@ test("family customization, navigation and monospace controls", async () => {
     await page.locator("#copy-appearance").evaluate((button) => button.click());
     await page.waitForFunction(() => window.lastCopy?.includes("--by-view-controls-font"));
     assert.match(await page.evaluate(() => lastCopy), /\.byCODEdocument/);
-    assert.ok((await page.evaluate(() => lastCopy)).includes("--by-view-bg: #123456"));
+    assert.ok((await page.evaluate(() => lastCopy)).includes("--by-view-document-bg: #123456"));
     await page.locator('[data-options-view="json"]').evaluate((button) => button.click());
     const configuration = JSON.parse(await page.locator("#options-json").inputValue());
     for (const [name, value] of Object.entries({
@@ -717,6 +718,7 @@ test("family customization, navigation and monospace controls", async () => {
       lineHeight: 1.8,
       controlsFont: "system-ui, sans-serif",
       backgroundColor: "#123456",
+      containerBackgroundColor: null,
       textColor: "#fedcba"
     })) {
       assert.deepEqual(configuration[name], value, name);
