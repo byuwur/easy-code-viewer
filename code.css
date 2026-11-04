@@ -340,7 +340,7 @@
 :is(.byCODEdocument, .byCODEblock) .byCODElineNumber {
   flex: 0 0 calc(var(--by-code-line-digits, 3) * 1ch + 1.25em + 0.0625rem);
   padding: 0 0.625em;
-  border-right: 0.0625rem solid color-mix(in srgb, var(--by-view-border, #d8d8c8) 50%, transparent);
+  border-right: 0.0625rem solid color-mix(in srgb, var(--by-view-border, #d8d8c8) 50%, #0000);
   background: color-mix(in srgb, var(--by-view-alt, #eeeee4) 40%, var(--by-view-container-bg, var(--by-view-bg, #fafaf5)));
   text-align: right;
   white-space: nowrap;
@@ -443,7 +443,7 @@
   gap: 0.25em;
   margin: 0;
   padding: 0.5rem 0;
-  background: transparent;
+  background: #0000;
   font: 0.875rem/1.25 var(--by-view-controls-font, ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace);
   white-space: normal;
 }
@@ -472,7 +472,7 @@
   flex-wrap: wrap-reverse;
 }
 .byCODEdocument > .byVIEWtoolbar .byVIEWinfo {
-  background: transparent;
+  background: #0000;
   max-width: 100%;
   color: var(--by-view-muted);
   opacity: 0.25;
@@ -602,7 +602,7 @@
 
 /* --- INTERACTION --- */
 .byCODEdocument button {
-  -webkit-tap-highlight-color: transparent;
+  -webkit-tap-highlight-color: #0000;
   touch-action: manipulation;
   transition:
     background-color 0.15s,
