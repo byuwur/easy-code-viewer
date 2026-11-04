@@ -1212,6 +1212,22 @@ test("highlight fragments inherit arbitrary hosts and retain standalone and expl
     );
     await page.addStyleTag({ path: path.join(__dirname, "../code.css") });
     await page.addScriptTag({ path: path.join(__dirname, "../code.js") });
+    const tokens = await page.evaluate(() => {
+      const source = "/* first\r\nsecond */\r\nconst value = `Hello ${name}`;";
+      const iterator = byCODEviewer.tokenize(source, "js");
+      const first = iterator.next(),
+        rest = [...iterator];
+      let invalid = false;
+      try {
+        [...byCODEviewer.tokenize(null)];
+      } catch (error) {
+        invalid = error instanceof TypeError;
+      }
+      return { source, restored: [first.value, ...rest].map((token) => token.text).join(""), first: first.value.type, invalid };
+    });
+    assert.equal(tokens.restored, tokens.source);
+    assert.equal(tokens.first, "comment");
+    assert.equal(tokens.invalid, true);
     await page.evaluate(() => {
       const names = ["comment", "keyword", "string", "number", "property", "tag"];
       const colors = ["#102030", "#203040", "#304050", "#405060", "#506070", "#607080"];

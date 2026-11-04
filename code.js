@@ -772,6 +772,8 @@
   byCODEviewer.VERSION = "1.1";
   byCODEviewer.initialized = true;
   byCODEviewer.languages = languages;
+  /** Yield source-preserving tokens lazily for editors without creating DOM. */
+  byCODEviewer.tokenize = tokenize;
   /** Optional code-block presentation preserves the fragment's exact source text. */
   byCODEviewer.highlight = (source, language = "plain", options = {}) => {
     const fragment = document.createDocumentFragment(),

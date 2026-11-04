@@ -50,6 +50,14 @@ Exported HTML starters use default settings, independently of playground changes
 
 `byCODEviewer.highlight(source, language = "plain", options = {})` synchronously returns a `DocumentFragment` with one `.byCODEhighlight` wrapper. Its textContent exactly preserves the source, including whitespace and CRLF. It creates no controls, changes no caller DOM, and never evaluates input.
 
+`byCODEviewer.tokenize(source, language = "plain")` returns a lazy iterator of `{ type, text }` tokens using the same scanner. Joining their text reproduces the source exactly. Editors can consume it in short slices without creating a viewer or DOM. Validation and token-limit errors occur during iteration; the same highlighting limits apply.
+
+```javascript
+const tokens = byCODEviewer.tokenize("const answer = 42;\r\n", "js");
+const original = [...tokens].map((token) => token.text).join("");
+// Consuming all tokens here is synchronous; editors can iterate in scheduled slices.
+```
+
 Load `code.css` to style fragments, even without a viewer instance. Unthemed fragments inherit `--by-code-*` colors from any container; missing colors use Monokai Light.
 
 For an explicit palette, use `.light` / `.dark` with a named `data-theme` on the returned wrapper, just like a full viewer. This overrides inherited colors. The `data-theme="light"` / `"dark"` aliases also work.
