@@ -384,7 +384,9 @@
   border-bottom: 0.0625rem solid var(--by-view-border, #d8d8c8);
   background: var(--by-view-container-bg, var(--by-view-alt, #eeeee4));
   color: var(--by-view-secondary, #686856);
-  font: 0.95em/1.4 system-ui, sans-serif;
+  font:
+    0.95em/1.4 system-ui,
+    sans-serif;
 }
 .byCODEblock > .byCODEstatus::before {
   content: attr(data-label);
