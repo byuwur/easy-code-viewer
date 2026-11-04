@@ -117,6 +117,8 @@ Fragments inherit Markdown's palette, Light/Dark mode, and custom `--by-code-*` 
 
 For other host pages, call `highlight(source, language)` and insert its fragment into your existing `<pre><code>`. The fragment API adds no controls or shared runtime state. No other viewer loads this library automatically.
 
+[easy-md-editor](https://github.com/byuwur/easy-md-editor) uses `tokenize()` while editing and the Markdown viewer's `highlight()` integration in Preview. Load the companion scripts before creating the editor.
+
 ## Shared controls and lifecycle
 
 | Option             | Default     | Behavior                                                                     |
@@ -134,6 +136,14 @@ For other host pages, call `highlight(source, language)` and insert its fragment
 
 The controller exposes `ready` and `destroy()`. `ready` resolves `true` after initial rendering, or `false` on a displayed data error or cancellation. Invalid targets/options can throw synchronously.
 
+`ready` describes the initial render only; it does not track later language selections.
+
+```javascript
+const viewer = byCODEviewer(target, source, { language: "js" });
+const rendered = await viewer.ready; // false on data errors or cancellation.
+viewer.destroy(); // Call when the host panel is removed.
+```
+
 Re-rendering disposes the previous instance. `destroy()` cancels pending work and clears the target only if the instance still owns it. Duplicate script loads preserve the API. Read its version with `byCODEviewer.VERSION`.
 
 Input is displayed as text, never executed. Style `.byCODEdocument` with `--by-view-bg`, `--by-view-text`, `--by-view-muted`, `--by-view-border`, `--by-view-accent`, `--by-view-alt`, `--by-view-string`, and `--by-view-literal`. The container uses system-ui; source/tree content uses monospace. Override the class or target's inline font/size as needed.
@@ -144,7 +154,7 @@ Requires a modern browser with async functions, WeakMap, ES2022 array methods, a
 
 `--by-view-content-font` and `--by-view-line-height` set source/tree typography.
 
-The default header shows Theme, text-size controls, and Copy. Secondary tools are opt-in. Use `toolbar: false` to hide the header, or switch individual controls off as needed.
+Use `toolbar: false` to hide the header, or disable `credits`, `themeToggle`, `fontSizeControls`, and `copyButton` individually. Content actions such as search and format-specific buttons use their own options.
 
 Controls use monospace by default; override `--by-view-controls-font` to change it.
 
@@ -177,7 +187,7 @@ High Contrast text colors target at least [7:1 contrast](https://www.w3.org/WAI/
 
 ### Make it yours
 
-**Custom theme CSS** starts with the selected palette's complete Light/Dark defaults, including controls and format-specific colors. Switching presets keeps your custom draft until Reset. On your page, use `data-theme="custom"` with `class="light"` or `class="dark"`.
+The playground's **Custom theme CSS** field edits both modes of the selected palette. Export those rules to your own stylesheet and use `data-theme="custom"` with `class="light"` or `class="dark"`. Custom drafts stay in the playground; the renderer does not store them.
 
 Define a named palette after the viewer stylesheet. Unspecified colors inherit Monokai:
 
@@ -230,9 +240,11 @@ node --test tests/rendering.cjs
 
 ## The easy viewers
 
-Need a viewer for another format? Explore the family:
+Need another format, or a Markdown editor? Explore the family:
 
 [Markdown](https://github.com/byuwur/easy-md-viewer) · [JSON](https://github.com/byuwur/easy-json-viewer) · [CSV & TSV](https://github.com/byuwur/easy-csv-viewer) · [Logs](https://github.com/byuwur/easy-log-viewer) · [Diff](https://github.com/byuwur/easy-diff-viewer) · [XML](https://github.com/byuwur/easy-xml-viewer) · [YAML](https://github.com/byuwur/easy-yaml-viewer) · [Source code](https://github.com/byuwur/easy-code-viewer)
+
+[Write Markdown with easy-md-editor](https://github.com/byuwur/easy-md-editor).
 
 ## License
 

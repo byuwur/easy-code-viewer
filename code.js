@@ -10,233 +10,17 @@
   /* --- SETUP --- */
   if (global.byCODEviewer?.initialized) return;
   const instances = new WeakMap();
+  /* --- DOM HELPERS --- */
   const node = (tag, className = "", text) => {
     const element = document.createElement(tag);
     element.className = className;
     if (text !== undefined) element.textContent = String(text);
     return element;
   };
+  /** Yield at a chunk boundary so input events and replacement renders can run. */
   const pause = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-  /* --- CONTROLS --- */
-  /**
-   * Adds container light/dark controls, retaining legacy stylesheet links as a fallback.
-   * @param {HTMLElement} element Viewer container and theme owner.
-   * @param {HTMLElement} controls Toolbar control group.
-   * @param {string} filename Legacy theme stylesheet basename.
-   * @returns {HTMLButtonElement} Theme toggle button.
-   */
-  const appendThemeToggle = (element, controls, filename) => {
-    const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const themePattern = new RegExp(`^([^?#]*/)?${escapedFilename}\\.(light|dark)\\.css([?#].*)?$`, "i");
-    const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => link && themePattern.test(link.getAttribute("href") || ""));
-    // Explicit container state takes precedence over a shared legacy stylesheet.
-    const localTheme = (target) => {
-      if (["light", "dark"].includes(target.dataset.theme)) return target.dataset.theme;
-      if (target.classList.contains("dark")) return "dark";
-      if (target.classList.contains("light")) return "light";
-      return target.dataset.theme ? "light" : null;
-    };
-    const legacyTheme = () => (stylesheet?.isConnected ? (stylesheet.getAttribute("href") || "").match(themePattern) : null);
-    const getTheme = () => localTheme(element) || legacyTheme()?.[2].toLowerCase() || "light";
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "byVIEWthemeToggle";
-    button.innerHTML =
-      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
-    const sync = () => {
-      const next = getTheme() === "dark" ? "light" : "dark";
-      const toggles = !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byCODEdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
-      for (const toggle of toggles) {
-        // A legacy link must not change the controls of independently themed viewers.
-        if (toggle !== button && localTheme(toggle.closest(".byCODEdocument"))) continue;
-        toggle.title = `Switch to ${next} theme`;
-        toggle.setAttribute("aria-label", toggle.title);
-      }
-    };
-    button.addEventListener("click", () => {
-      const next = getTheme() === "dark" ? "light" : "dark";
-      if (!localTheme(element) && legacyTheme()) {
-        const href = stylesheet.getAttribute("href");
-        stylesheet.setAttribute(
-          "href",
-          href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${filename}.${next}.css${suffix}`)
-        );
-      } else if (element.dataset.theme && !["light", "dark"].includes(element.dataset.theme)) {
-        // Named palettes stay selected while only the mode changes.
-        element.classList.toggle("light", next === "light");
-        element.classList.toggle("dark", next === "dark");
-      } else if (element.hasAttribute("data-theme") || (!element.classList.contains("light") && !element.classList.contains("dark"))) {
-        element.dataset.theme = next;
-      } else {
-        element.classList.toggle("light", next === "light");
-        element.classList.toggle("dark", next === "dark");
-      }
-      sync();
-    });
-    button.addEventListener("focus", sync);
-    button.addEventListener("pointerenter", sync);
-    sync();
-    return controls.appendChild(button);
-  };
-
-  /**
-   * Adds text size controls for a renderer.
-   * @param {HTMLElement} element - Renderer whose font size is changed.
-   * @param {HTMLElement} controls - Toolbar that receives the controls.
-   * @return {HTMLElement} The text size button group.
-   */
-  const appendFontSizeControls = (element, controls) => {
-    element.dataset.byViewDefaultFontSize ??= element.style.fontSize;
-    const sizes = document.createElement("div");
-    sizes.className = "byVIEWfontSizes";
-    controls.appendChild(sizes);
-    const getSize = () => (parseFloat(getComputedStyle(element).fontSize) || 16) / (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
-    const decrease = document.createElement("button");
-    const increase = document.createElement("button");
-    const reset = document.createElement("button");
-    reset.textContent = "A";
-    decrease.textContent = "A-";
-    increase.textContent = "A+";
-    for (const [button, title] of [
-      [decrease, "Decrease text size"],
-      [reset, "Reset text size"],
-      [increase, "Increase text size"]
-    ]) {
-      button.type = "button";
-      button.className = "byVIEWfontSize";
-      button.title = title;
-      button.setAttribute("aria-label", title);
-      sizes.appendChild(button);
-    }
-    const sync = () => {
-      const size = getSize();
-      decrease.disabled = size <= 0.5;
-      increase.disabled = size >= 3;
-    };
-    for (const [button, step] of [
-      [decrease, -0.125],
-      [increase, 0.125]
-    ]) {
-      button.addEventListener("click", () => {
-        const size = Math.max(0.5, Math.min(3, getSize() + step));
-        element.style.fontSize = `${size}rem`;
-        sync();
-      });
-    }
-    reset.addEventListener("click", () => {
-      element.style.fontSize = element.dataset.byViewDefaultFontSize;
-      sync();
-    });
-    sync();
-    return sizes;
-  };
-
-  /**
-   * Add a copy action for the complete source, including content outside the visible rendered chunk.
-   * @param {HTMLElement} controls Toolbar control group.
-   * @param {Function} getText Callback that returns the text to copy.
-   * @param {string} label Human-readable label.
-   * @returns {void}
-   */
-  const appendCopyButton = (controls, getText, label) => {
-    const button = document.createElement("button");
-    button.type = "button";
-    button.className = "byVIEWcopy";
-    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><!--!Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M288 64C252.7 64 224 92.7 224 128L224 384C224 419.3 252.7 448 288 448L480 448C515.3 448 544 419.3 544 384L544 183.4C544 166 536.9 149.3 524.3 137.2L466.6 81.8C454.7 70.4 438.8 64 422.3 64L288 64zM160 192C124.7 192 96 220.7 96 256L96 512C96 547.3 124.7 576 160 576L352 576C387.3 576 416 547.3 416 512L416 496L352 496L352 512L160 512L160 256L176 256L176 192L160 192z"/></svg>`;
-    const caption = document.createElement("span");
-    caption.setAttribute("aria-live", "polite");
-    button.appendChild(caption);
-    const reset = () => {
-      if (button.dataset.state === "error") return;
-      delete button.dataset.state;
-      caption.textContent = "Copy";
-      button.title = label;
-      button.setAttribute("aria-label", label);
-    };
-    reset();
-    button.addEventListener("mouseleave", reset);
-    button.addEventListener("focusout", reset);
-    controls.appendChild(button);
-    button.addEventListener("click", async (event) => {
-      button.disabled = true;
-      let message = "Copied!";
-      try {
-        await navigator.clipboard.writeText(getText(event));
-        caption.textContent = message;
-        button.dataset.state = "success";
-      } catch {
-        caption.textContent = "Failed";
-        button.dataset.state = "error";
-        message = "Copy failed. Check clipboard access.";
-      } finally {
-        button.disabled = false;
-        button.title = `${message} ${label}`;
-        button.setAttribute("aria-label", button.title);
-      }
-    });
-  };
-
-  /* --- LIFECYCLE --- */
-  // One instance owns the container; replacement disposes its pending work first.
-  const mount = (element, options, getText) => {
-    if (!(element instanceof HTMLElement)) throw new TypeError("byCODEviewer: element must be an HTMLElement.");
-    instances.get(element)?.destroy();
-    const state = { active: true };
-    state.destroy = () => {
-      if (!state.active) return;
-      state.active = false;
-      if (instances.get(element) === state) {
-        instances.delete(element);
-        element.replaceChildren();
-        element.classList.remove("byCODEdocument", "byVIEWcompact", "byVIEWbottom");
-        element.removeAttribute("aria-busy");
-      }
-    };
-    instances.set(element, state);
-    element.replaceChildren();
-    element.classList.add("byCODEdocument");
-    element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
-    element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
-    const content = node("div", "byVIEWcontent");
-    const toolbar = node("div", "byVIEWtoolbar");
-    toolbar.dataset.size = ["small", "regular", "large"].includes(options.controlsSize) ? options.controlsSize : "regular";
-    const info = node("small", "byVIEWinfo");
-    for (const [text, href] of [
-      ["easy-code-viewer", "https://github.com/byuwur/easy-code-viewer"],
-      ["@byUwUr", "https://byuwur.co"]
-    ]) {
-      const link = node("a", "", text);
-      link.href = href;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      if (info.childNodes.length) info.append(` · v${byCODEviewer.VERSION} · `);
-      info.appendChild(link);
-    }
-    if (options.credits !== false) toolbar.appendChild(info);
-    const controls = node("div", "byVIEWcontrols");
-    controls.setAttribute("role", "group");
-    controls.setAttribute("aria-label", "Viewer controls");
-    if (options.themeToggle !== false) appendThemeToggle(element, controls, "code");
-    if (options.fontSizeControls !== false) appendFontSizeControls(element, controls);
-    if (options.copyButton !== false) appendCopyButton(controls, getText, "Copy source");
-    if (controls.childNodes.length) toolbar.appendChild(controls);
-    if (options.toolbar === false || !toolbar.childNodes.length) {
-      element.classList.remove("byVIEWbottom");
-      element.appendChild(content);
-    } else element.append(...(options.controlsPosition === "bottom" ? [content, toolbar] : [toolbar, content]));
-    state.content = content;
-    state.error = (error) => {
-      if (!state.active) return;
-      element.setAttribute("aria-busy", "false");
-      const message = node("p", "byVIEWerror", error.message);
-      message.setAttribute("role", "alert");
-      content.replaceChildren(message);
-    };
-    return state;
-  };
-
-  /* --- CONTENT --- */
+  /* --- PARSING --- */
   const words = (source) => new Set(source.split(" "));
   const javascript = words(
     "async await break case catch class const continue debugger default delete do else export extends finally for from function get if import in instanceof let new of return set static super switch this throw try typeof var void while with yield"
@@ -282,11 +66,13 @@
   };
   const aliases = { js: "javascript", ts: "typescript", htm: "html", yml: "yaml", py: "python", sh: "bash", shell: "bash", text: "plain", txt: "plain" };
   const languages = Object.freeze(["html", "css", "javascript", "json", "xml", "yaml", "php", "sql", "python", "bash", "typescript", "plain"]);
+  /** Resolve supported aliases; unknown names deliberately fall back to uncolored source. */
   const languageName = (value) => {
     const name = String(value ?? "plain").toLowerCase();
     return aliases[name] || (languages.includes(name) ? name : "plain");
   };
   const token = (type, text) => ({ type, text });
+  /** Find a language-specific closing quote without interpreting comment markers inside strings. */
   const quotedEnd = (source, start, end, language) => {
     const quote = source[start],
       triple = language === "python" && source.startsWith(quote.repeat(3), start);
@@ -314,6 +100,7 @@
   };
 
   // Tokenization consumes original slices once; strings/comments own their contents before keyword matching.
+  /** Yield original source slices while carrying lexical context across lines and nested templates. */
   function* scriptTokens(source, language, start = 0, end = source.length, stop = "", depth = 0) {
     const profile = profiles[language];
     let i = start,
@@ -546,6 +333,7 @@
     return i;
   }
 
+  /** Scan tags and raw script/style regions; embedded source keeps its original character positions. */
   function* markupTokens(source, language) {
     let i = 0;
     while (i < source.length) {
@@ -609,6 +397,7 @@
   }
 
   // PHP is lexed first, then masked in its HTML host. Overlay keeps host strings/tags intact across server blocks.
+  /** Mask PHP regions while scanning the HTML host, then overlay their tokens at the same offsets. */
   function* phpTokens(source) {
     const regions = [],
       host = [];
@@ -654,6 +443,8 @@
       }
     }
   }
+  // Yield original slices, including whitespace. Validation runs when the iterator is consumed.
+  /** Return a lazy token stream; input and resource-limit errors occur when iteration advances. */
   function* tokenize(source, language) {
     if (typeof source !== "string") throw new TypeError("Code source must be a string.");
     if (source.length > 2000000 || source.split("\n").length > 20000) throw new RangeError("Code exceeds 2 million characters or 20,000 lines.");
@@ -665,6 +456,7 @@
       if (part.text) yield part;
     }
   }
+  /* --- RENDERING --- */
   const appendToken = (parent, part, text = part.text) => {
     if (part.type === "plain") parent.appendChild(document.createTextNode(text));
     else parent.appendChild(node("span", `byCODEtoken byCODE${part.type}`, text));
@@ -672,8 +464,229 @@
 
   const codeStatus = (source, language, count) => (!source.length ? "No source code." : `${language} \u00b7 ${count} ${count === 1 ? "line" : "lines"}`);
 
-  /** Stateful lexical highlighting; source is never interpreted as HTML or executed. */
+
+  /* --- CONTROLS --- */
+  // Mirrored across the family so each viewer can run without a shared runtime.
+  /**
+   * Adds container light/dark controls, retaining legacy stylesheet links as a fallback.
+   * @param {HTMLElement} element Viewer container and theme owner.
+   * @param {HTMLElement} controls Toolbar control group.
+   * @param {string} filename Legacy theme stylesheet basename.
+   * @returns {HTMLButtonElement} Theme toggle button.
+   */
+  const appendThemeToggle = (element, controls, filename) => {
+    const escapedFilename = filename.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+    const themePattern = new RegExp(`^([^?#]*/)?${escapedFilename}\\.(light|dark)\\.css([?#].*)?$`, "i");
+    const stylesheet = [document.getElementById("byVIEWtheme"), ...document.querySelectorAll('link[rel~="stylesheet"]')].find((link) => link && themePattern.test(link.getAttribute("href") || ""));
+    // Explicit container state takes precedence over a shared legacy stylesheet.
+    const localTheme = (target) => {
+      if (["light", "dark"].includes(target.dataset.theme)) return target.dataset.theme;
+      if (target.classList.contains("dark")) return "dark";
+      if (target.classList.contains("light")) return "light";
+      return target.dataset.theme ? "light" : null;
+    };
+    const legacyTheme = () => (stylesheet?.isConnected ? (stylesheet.getAttribute("href") || "").match(themePattern) : null);
+    const getTheme = () => localTheme(element) || legacyTheme()?.[2].toLowerCase() || "light";
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "byVIEWthemeToggle";
+    button.innerHTML =
+      '<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><path d="M21 12.8A9 9 0 0 1 11.2 3 9 9 0 1 0 21 12.8Z"/></svg><svg viewBox="0 0 24 24" aria-hidden="true" focusable="false"><circle cx="12" cy="12" r="4"/><path d="M12 2v2m0 16v2M2 12h2m16 0h2M4.9 4.9l1.4 1.4m11.4 11.4 1.4 1.4m0-14.2-1.4 1.4M6.3 17.7l-1.4 1.4"/></svg>';
+    const sync = () => {
+      const next = getTheme() === "dark" ? "light" : "dark";
+      const toggles = !localTheme(element) && legacyTheme() ? [button, ...document.querySelectorAll(".byCODEdocument > .byVIEWtoolbar > .byVIEWcontrols > .byVIEWthemeToggle")] : [button];
+      for (const toggle of toggles) {
+        // A legacy link must not change the controls of independently themed viewers.
+        if (toggle !== button && localTheme(toggle.closest(".byCODEdocument"))) continue;
+        toggle.title = `Switch to ${next} theme`;
+        toggle.setAttribute("aria-label", toggle.title);
+      }
+    };
+    button.addEventListener("click", () => {
+      const next = getTheme() === "dark" ? "light" : "dark";
+      if (!localTheme(element) && legacyTheme()) {
+        const href = stylesheet.getAttribute("href");
+        stylesheet.setAttribute(
+          "href",
+          href.replace(themePattern, (_, path = "", theme, suffix = "") => `${path}${filename}.${next}.css${suffix}`)
+        );
+      } else if (element.dataset.theme && !["light", "dark"].includes(element.dataset.theme)) {
+        // Named palettes stay selected while only the mode changes.
+        element.classList.toggle("light", next === "light");
+        element.classList.toggle("dark", next === "dark");
+      } else if (element.hasAttribute("data-theme") || (!element.classList.contains("light") && !element.classList.contains("dark"))) {
+        element.dataset.theme = next;
+      } else {
+        element.classList.toggle("light", next === "light");
+        element.classList.toggle("dark", next === "dark");
+      }
+      sync();
+    });
+    button.addEventListener("focus", sync);
+    button.addEventListener("pointerenter", sync);
+    sync();
+    return controls.appendChild(button);
+  };
+
+  /**
+   * Adds text size controls for a renderer.
+   * @param {HTMLElement} element - Renderer whose font size is changed.
+   * @param {HTMLElement} controls - Toolbar that receives the controls.
+   * @return {HTMLElement} The text size button group.
+   */
+  const appendFontSizeControls = (element, controls) => {
+    element.dataset.byViewDefaultFontSize ??= element.style.fontSize;
+    const sizes = document.createElement("div");
+    sizes.className = "byVIEWfontSizes";
+    controls.appendChild(sizes);
+    const getSize = () => (parseFloat(getComputedStyle(element).fontSize) || 16) / (parseFloat(getComputedStyle(document.documentElement).fontSize) || 16);
+    const decrease = document.createElement("button");
+    const increase = document.createElement("button");
+    const reset = document.createElement("button");
+    reset.textContent = "A";
+    decrease.textContent = "A-";
+    increase.textContent = "A+";
+    for (const [button, title] of [
+      [decrease, "Decrease text size"],
+      [reset, "Reset text size"],
+      [increase, "Increase text size"]
+    ]) {
+      button.type = "button";
+      button.className = "byVIEWfontSize";
+      button.title = title;
+      button.setAttribute("aria-label", title);
+      sizes.appendChild(button);
+    }
+    const sync = () => {
+      const size = getSize();
+      decrease.disabled = size <= 0.5;
+      increase.disabled = size >= 3;
+    };
+    for (const [button, step] of [
+      [decrease, -0.125],
+      [increase, 0.125]
+    ]) {
+      button.addEventListener("click", () => {
+        const size = Math.max(0.5, Math.min(3, getSize() + step));
+        element.style.fontSize = `${size}rem`;
+        sync();
+      });
+    }
+    reset.addEventListener("click", () => {
+      element.style.fontSize = element.dataset.byViewDefaultFontSize;
+      sync();
+    });
+    sync();
+    return sizes;
+  };
+
+  /**
+   * Add a copy action for the complete source, including content outside the visible rendered chunk.
+   * @param {HTMLElement} controls Toolbar control group.
+   * @param {Function} getText Callback that returns the text to copy.
+   * @param {string} label Human-readable label.
+   * @returns {void}
+   */
+  const appendCopyButton = (controls, getText, label) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "byVIEWcopy";
+    button.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 640 640" aria-hidden="true" focusable="false"><!--!Font Awesome Free 7.3.1 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2026 Fonticons, Inc.--><path d="M288 64C252.7 64 224 92.7 224 128L224 384C224 419.3 252.7 448 288 448L480 448C515.3 448 544 419.3 544 384L544 183.4C544 166 536.9 149.3 524.3 137.2L466.6 81.8C454.7 70.4 438.8 64 422.3 64L288 64zM160 192C124.7 192 96 220.7 96 256L96 512C96 547.3 124.7 576 160 576L352 576C387.3 576 416 547.3 416 512L416 496L352 496L352 512L160 512L160 256L176 256L176 192L160 192z"/></svg>`;
+    const caption = document.createElement("span");
+    caption.setAttribute("aria-live", "polite");
+    button.appendChild(caption);
+    const reset = () => {
+      if (button.dataset.state === "error") return;
+      delete button.dataset.state;
+      caption.textContent = "Copy";
+      button.title = label;
+      button.setAttribute("aria-label", label);
+    };
+    reset();
+    button.addEventListener("mouseleave", reset);
+    button.addEventListener("focusout", reset);
+    controls.appendChild(button);
+    button.addEventListener("click", async (event) => {
+      button.disabled = true;
+      let message = "Copied!";
+      try {
+        await navigator.clipboard.writeText(getText(event));
+        caption.textContent = message;
+        button.dataset.state = "success";
+      } catch {
+        caption.textContent = "Failed";
+        button.dataset.state = "error";
+        message = "Copy failed. Check clipboard access.";
+      } finally {
+        button.disabled = false;
+        button.title = `${message} ${label}`;
+        button.setAttribute("aria-label", button.title);
+      }
+    });
+  };
+
+  /* --- LIFECYCLE --- */
+  // One instance owns the container; replacement disposes its pending work first.
+  /** Replace the previous owner and return its cancellable state. Only the current owner may clear the host. */
+  const mount = (element, options, getText) => {
+    if (!(element instanceof HTMLElement)) throw new TypeError("byCODEviewer: element must be an HTMLElement.");
+    instances.get(element)?.destroy();
+    const state = { active: true };
+    state.destroy = () => {
+      if (!state.active) return;
+      state.active = false;
+      if (instances.get(element) === state) {
+        instances.delete(element);
+        element.replaceChildren();
+        element.classList.remove("byCODEdocument", "byVIEWcompact", "byVIEWbottom");
+        element.removeAttribute("aria-busy");
+      }
+    };
+    instances.set(element, state);
+    element.replaceChildren();
+    element.classList.add("byCODEdocument");
+    element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
+    element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
+    const content = node("div", "byVIEWcontent");
+    const toolbar = node("div", "byVIEWtoolbar");
+    toolbar.dataset.size = ["small", "regular", "large"].includes(options.controlsSize) ? options.controlsSize : "regular";
+    const info = node("small", "byVIEWinfo");
+    for (const [text, href] of [
+      ["easy-code-viewer", "https://github.com/byuwur/easy-code-viewer"],
+      ["@byUwUr", "https://byuwur.co"]
+    ]) {
+      const link = node("a", "", text);
+      link.href = href;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      if (info.childNodes.length) info.append(` · v${byCODEviewer.VERSION} · `);
+      info.appendChild(link);
+    }
+    if (options.credits !== false) toolbar.appendChild(info);
+    const controls = node("div", "byVIEWcontrols");
+    controls.setAttribute("role", "group");
+    controls.setAttribute("aria-label", "Viewer controls");
+    if (options.themeToggle !== false) appendThemeToggle(element, controls, "code");
+    if (options.fontSizeControls !== false) appendFontSizeControls(element, controls);
+    if (options.copyButton !== false) appendCopyButton(controls, getText, "Copy source");
+    if (controls.childNodes.length) toolbar.appendChild(controls);
+    if (options.toolbar === false || !toolbar.childNodes.length) {
+      element.classList.remove("byVIEWbottom");
+      element.appendChild(content);
+    } else element.append(...(options.controlsPosition === "bottom" ? [content, toolbar] : [toolbar, content]));
+    state.content = content;
+    state.error = (error) => {
+      if (!state.active) return;
+      element.setAttribute("aria-busy", "false");
+      const message = node("p", "byVIEWerror", error.message);
+      message.setAttribute("role", "alert");
+      content.replaceChildren(message);
+    };
+    return state;
+  };
+
   /* --- PUBLIC API --- */
+  /** Stateful lexical highlighting; source is never interpreted as HTML or executed. */
   function byCODEviewer(element, source, options = {}) {
     if (source === undefined) source = element?.textContent ?? "";
     if (typeof source !== "string") throw new TypeError("Code source must be a string.");
@@ -713,7 +726,9 @@
     };
     syncWrap();
     wrap.addEventListener("change", syncWrap);
+    /* --- RENDERING --- */
     const render = async () => {
+      // A later language selection supersedes any render paused between token chunks.
       const version = ++generation;
       element.setAttribute("aria-busy", "true");
       try {
@@ -772,7 +787,7 @@
   byCODEviewer.VERSION = "1.1";
   byCODEviewer.initialized = true;
   byCODEviewer.languages = languages;
-  /** Yield source-preserving tokens lazily for editors without creating DOM. */
+  /** Lazy source-preserving tokens let editors schedule lexical work without mounting a viewer. */
   byCODEviewer.tokenize = tokenize;
   /** Optional code-block presentation preserves the fragment's exact source text. */
   byCODEviewer.highlight = (source, language = "plain", options = {}) => {
@@ -813,6 +828,7 @@
       const label = codeStatus(source, languageName(language), count);
       wrapper.setAttribute("role", "region");
       wrapper.setAttribute("aria-label", label);
+      // Labels live in attributes/CSS so copying textContent returns only the original code.
       if (options.statusBar) {
         const status = node("span", "byCODEstatus");
         status.dataset.label = label;
