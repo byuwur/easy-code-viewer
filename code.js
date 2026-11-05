@@ -11,7 +11,7 @@
   if (global.byCODEviewer?.initialized) return;
 
   /* --- METADATA --- */
-  byCODEviewer.VERSION = "1.5"; // 2026-11-05
+  byCODEviewer.VERSION = "1.6"; // 2026-11-05
 
   /* --- CONSTANTS --- */
   const javascript = new Set([
