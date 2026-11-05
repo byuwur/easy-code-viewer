@@ -631,13 +631,14 @@
       if (instances.get(element) === state) {
         instances.delete(element);
         element.replaceChildren();
-        element.classList.remove("byCODEdocument", "byVIEWcompact", "byVIEWbottom");
+        element.classList.remove("byCODEdocument", "byVIEWcompact", "byVIEWbottom", "byVIEWmotion");
         element.removeAttribute("aria-busy");
       }
     };
     instances.set(element, state);
     element.replaceChildren();
     element.classList.add("byCODEdocument");
+    element.classList.toggle("byVIEWmotion", options.animations !== false);
     element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
     element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
     const content = node("div", "byVIEWcontent");
