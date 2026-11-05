@@ -661,6 +661,7 @@
     element.replaceChildren();
     element.classList.add("byCODEdocument");
     element.classList.toggle("byVIEWmotion", options.animations !== false);
+    element.classList.toggle("byVIEWplain", options.displayContainer === false);
     element.classList.toggle("byVIEWcompact", options.controlsCompact !== false);
     element.classList.toggle("byVIEWbottom", options.controlsPosition === "bottom");
     const content = node("div", "byVIEWcontent");
