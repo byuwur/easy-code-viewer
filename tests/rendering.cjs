@@ -787,6 +787,7 @@ test("highlight fragments inherit arbitrary hosts and retain standalone and expl
       light.map((color, index) => (index === 1 ? "rgb(18, 52, 86)" : color))
     );
     assert.deepEqual(await page.evaluate(() => fragmentColors("explicit")), ["rgb(145, 152, 161)", "rgb(255, 123, 114)", "rgb(165, 214, 255)", "rgb(121, 192, 255)", "rgb(255, 166, 87)", "rgb(126, 231, 135)"]);
+    assert.equal(await page.locator("#explicit .byCODEhighlight").evaluate((fragment) => getComputedStyle(fragment).color), "rgb(240, 246, 252)", "Explicit dark fragments must also color unclassified source text");
     assert.deepEqual(await page.evaluate(() => fragmentColors("light")), light);
     assert.deepEqual(await page.evaluate(() => fragmentColors("monokai")), light);
     await page.locator("#host").evaluate((host) => host.style.setProperty("--by-code-keyword", "#abcdef"));
