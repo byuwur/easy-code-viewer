@@ -11,7 +11,7 @@
   if (global.byCODEviewer?.initialized) return;
 
   /* --- METADATA --- */
-  byCODEviewer.VERSION = "1.3"; // 2026-11-04
+  byCODEviewer.VERSION = "1.4"; // 2026-11-04
 
   /* --- CONSTANTS --- */
   const words = (source) => new Set(source.split(" "));
