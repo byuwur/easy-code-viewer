@@ -60,7 +60,9 @@ const original = [...tokens].map((token) => token.text).join("");
 
 Load `code.css` to style fragments, even without a viewer instance. Unthemed fragments inherit `--by-code-*` colors from any container; missing colors use Monokai Light.
 
-For an explicit palette, use `.light` / `.dark` with a named `data-theme` on the returned wrapper, just like a full viewer. This overrides inherited colors. The `data-theme="light"` / `"dark"` aliases also work.
+Pass `{ theme: "dark", palette: "github" }` as the third argument to set the fragment's mode and palette, including unclassified text. Both options follow the viewer's validation rules. Omit them to inherit the host's colors.
+
+You can also use `.light` / `.dark` with a named `data-theme` on the returned wrapper. The `data-theme="light"` / `"dark"` aliases remain supported. Explicit themes override inherited colors.
 
 Pass `{ lineNumbers: true, statusBar: true }` as the third argument for a compact framed block. Both options default to `false` and work independently. Line numbers and status are presentation labels; `textContent` still preserves the exact source, including final newlines. Set `highlighting: false` to keep the language label without coloring tokens. The block creates no viewer instance, toolbar, or asynchronous lifecycle.
 
@@ -68,8 +70,7 @@ Invalid source/size throws `TypeError`/`RangeError` before returning a fragment.
 
 ```javascript
 const code = document.querySelector("pre code");
-const fragment = byCODEviewer.highlight(code.textContent, "javascript");
-fragment.firstElementChild.dataset.theme = "dark";
+const fragment = byCODEviewer.highlight(code.textContent, "javascript", { theme: "dark" });
 code.replaceChildren(fragment);
 ```
 

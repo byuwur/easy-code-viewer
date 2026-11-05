@@ -819,6 +819,7 @@
     const fragment = document.createDocumentFragment(),
       wrapper = node("span", "byCODEhighlight"),
       tokens = byCODEviewer.tokenize(source, options.highlighting === false ? "plain" : language);
+    applyAppearance(wrapper, { theme: options.theme, palette: options.palette });
     if (!options.lineNumbers && !options.statusBar) {
       for (const part of tokens) appendToken(wrapper, part);
     } else {

@@ -788,6 +788,46 @@ test("highlight fragments inherit arbitrary hosts and retain standalone and expl
     );
     assert.deepEqual(await page.evaluate(() => fragmentColors("explicit")), ["rgb(145, 152, 161)", "rgb(255, 123, 114)", "rgb(165, 214, 255)", "rgb(121, 192, 255)", "rgb(255, 166, 87)", "rgb(126, 231, 135)"]);
     assert.equal(await page.locator("#explicit .byCODEhighlight").evaluate((fragment) => getComputedStyle(fragment).color), "rgb(240, 246, 252)", "Explicit dark fragments must also color unclassified source text");
+    const appearances = await page.evaluate(() => {
+      const source = '<script>document.addEventListener("load", () => {});</script>\r\n';
+      return [
+        { theme: "dark", palette: "monokai" },
+        { theme: "light", palette: "github" },
+        { theme: "dark", palette: "github", lineNumbers: true, statusBar: true }
+      ].map((options) => {
+        const fragment = byCODEviewer.highlight(source, "html", options),
+          wrapper = fragment.firstElementChild;
+        document.getElementById("host").append(fragment);
+        const style = getComputedStyle(wrapper);
+        return {
+          exact: wrapper.textContent === source,
+          mode: wrapper.classList.contains(options.theme),
+          palette: wrapper.dataset.theme,
+          color: style.color,
+          background: style.backgroundColor,
+          controls: wrapper.querySelectorAll("button, input, select").length
+        };
+      });
+    });
+    assert.deepEqual(appearances, [
+      { exact: true, mode: true, palette: "monokai", color: "rgb(248, 248, 242)", background: "rgba(0, 0, 0, 0)", controls: 0 },
+      { exact: true, mode: true, palette: "github", color: "rgb(31, 35, 40)", background: "rgba(0, 0, 0, 0)", controls: 0 },
+      { exact: true, mode: true, palette: "github", color: "rgb(240, 246, 252)", background: "rgb(13, 17, 23)", controls: 0 }
+    ]);
+    assert.equal(
+      await page.evaluate(() => {
+        let rejected = 0;
+        for (const options of [{ theme: "sepia" }, { palette: "dark" }]) {
+          try {
+            byCODEviewer.highlight("text", "plain", options);
+          } catch (error) {
+            if (error instanceof RangeError) rejected++;
+          }
+        }
+        return rejected;
+      }),
+      2
+    );
     assert.deepEqual(await page.evaluate(() => fragmentColors("light")), light);
     assert.deepEqual(await page.evaluate(() => fragmentColors("monokai")), light);
     await page.locator("#host").evaluate((host) => host.style.setProperty("--by-code-keyword", "#abcdef"));
