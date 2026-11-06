@@ -14,331 +14,95 @@
   byCODEviewer.VERSION = "1.6"; // 2026-11-05
 
   // --- CONSTANTS ---
-  const javascript = new Set([
-    "async",
-    "await",
-    "break",
-    "case",
-    "catch",
-    "class",
-    "const",
-    "continue",
-    "debugger",
-    "default",
-    "delete",
-    "do",
-    "else",
-    "export",
-    "extends",
-    "finally",
-    "for",
-    "from",
-    "function",
-    "get",
-    "if",
-    "import",
-    "in",
-    "instanceof",
-    "let",
-    "new",
-    "of",
-    "return",
-    "set",
-    "static",
-    "super",
-    "switch",
-    "this",
-    "throw",
-    "try",
-    "typeof",
-    "var",
-    "void",
-    "while",
-    "with",
-    "yield"
-  ]);
+  // Language data stays separate from the shared scanner; lookup sets are built once.
+  // prettier-ignore
   const profiles = {
-    javascript: { keywords: javascript, slashComments: true, templates: true, regex: true },
-    typescript: {
-      keywords: new Set([
-        ...javascript,
-        "abstract",
-        "any",
-        "as",
-        "asserts",
-        "bigint",
-        "boolean",
-        "constructor",
-        "declare",
-        "enum",
-        "implements",
-        "infer",
-        "interface",
-        "is",
-        "keyof",
-        "module",
-        "namespace",
-        "never",
-        "number",
-        "object",
-        "private",
-        "protected",
-        "public",
-        "readonly",
-        "require",
-        "satisfies",
-        "string",
-        "symbol",
-        "type",
-        "undefined",
-        "unique",
-        "unknown"
-      ]),
-      slashComments: true,
-      templates: true,
-      regex: true
-    },
-    css: { keywords: new Set(["important", "inherit", "initial", "unset", "revert"]), blockComments: true },
-    json: { keywords: new Set() },
-    yaml: { keywords: new Set(), hashComments: true },
-    php: {
-      keywords: new Set([
-        "abstract",
-        "and",
-        "array",
-        "as",
-        "break",
-        "callable",
-        "case",
-        "catch",
-        "class",
-        "clone",
-        "const",
-        "continue",
-        "declare",
-        "default",
-        "die",
-        "do",
-        "echo",
-        "else",
-        "elseif",
-        "empty",
-        "enddeclare",
-        "endfor",
-        "endforeach",
-        "endif",
-        "endswitch",
-        "endwhile",
-        "enum",
-        "eval",
-        "exit",
-        "extends",
-        "final",
-        "finally",
-        "fn",
-        "for",
-        "foreach",
-        "function",
-        "global",
-        "goto",
-        "if",
-        "implements",
-        "include",
-        "include_once",
-        "instanceof",
-        "insteadof",
-        "interface",
-        "isset",
-        "list",
-        "match",
-        "namespace",
-        "new",
-        "or",
-        "parent",
-        "print",
-        "private",
-        "protected",
-        "public",
-        "readonly",
-        "require",
-        "require_once",
-        "return",
-        "self",
-        "static",
-        "switch",
-        "throw",
-        "trait",
-        "try",
-        "unset",
-        "use",
-        "var",
-        "while",
-        "xor",
-        "yield"
-      ]),
-      slashComments: true,
-      hashComments: true
-    },
-    sql: {
-      keywords: new Set([
-        "add",
-        "all",
-        "alter",
-        "and",
-        "as",
-        "asc",
-        "begin",
-        "between",
-        "by",
-        "case",
-        "cast",
-        "check",
-        "column",
-        "commit",
-        "constraint",
-        "create",
-        "cross",
-        "database",
-        "default",
-        "delete",
-        "desc",
-        "distinct",
-        "drop",
-        "else",
-        "end",
-        "except",
-        "exists",
-        "foreign",
-        "from",
-        "full",
-        "function",
-        "grant",
-        "group",
-        "having",
-        "if",
-        "in",
-        "index",
-        "inner",
-        "insert",
-        "intersect",
-        "into",
-        "is",
-        "join",
-        "key",
-        "left",
-        "like",
-        "limit",
-        "not",
-        "null",
-        "offset",
-        "on",
-        "or",
-        "order",
-        "outer",
-        "over",
-        "partition",
-        "primary",
-        "procedure",
-        "references",
-        "returning",
-        "right",
-        "rollback",
-        "row",
-        "select",
-        "set",
-        "table",
-        "then",
-        "top",
-        "transaction",
-        "trigger",
-        "truncate",
-        "union",
-        "unique",
-        "update",
-        "use",
-        "using",
-        "values",
-        "view",
-        "when",
-        "where",
-        "window",
-        "with"
-      ]),
-      dashComments: true,
-      blockComments: true
-    },
-    python: {
-      keywords: new Set([
-        "and",
-        "as",
-        "assert",
-        "async",
-        "await",
-        "break",
-        "class",
-        "continue",
-        "def",
-        "del",
-        "elif",
-        "else",
-        "except",
-        "finally",
-        "for",
-        "from",
-        "global",
-        "if",
-        "import",
-        "in",
-        "is",
-        "lambda",
-        "nonlocal",
-        "not",
-        "or",
-        "pass",
-        "raise",
-        "return",
-        "try",
-        "while",
-        "with",
-        "yield"
-      ]),
-      hashComments: true
-    },
-    bash: {
-      keywords: new Set([
-        "if",
-        "then",
-        "else",
-        "elif",
-        "fi",
-        "for",
-        "while",
-        "until",
-        "do",
-        "done",
-        "case",
-        "esac",
-        "in",
-        "function",
-        "select",
-        "time",
-        "coproc",
-        "export",
-        "readonly",
-        "local",
-        "declare",
-        "typeset",
-        "unset",
-        "return",
-        "break",
-        "continue",
-        "source"
-      ]),
-      hashComments: true
-    }
+    javascript: {keywords: ["async", "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "from", "function", "get", "if", "import", "in", "instanceof", "let", "new", "of", "return", "set", "static", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"], slashComments: true, templates: true, regex: true},
+    typescript: {keywords: ["async", "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "from", "function", "get", "if", "import", "in", "instanceof", "let", "new", "of", "return", "set", "static", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield", "abstract", "any", "as", "asserts", "bigint", "boolean", "constructor", "declare", "enum", "implements", "infer", "interface", "is", "keyof", "module", "namespace", "never", "number", "object", "private", "protected", "public", "readonly", "require", "satisfies", "string", "symbol", "type", "undefined", "unique", "unknown"], slashComments: true, templates: true, regex: true},
+    css: {keywords: ["important", "inherit", "initial", "unset", "revert"], blockComments: true, css: true},
+    json: {keywords: []},
+    yaml: {keywords: [], hashComments: true},
+    php: {keywords: ["abstract", "and", "array", "as", "break", "callable", "case", "catch", "class", "clone", "const", "continue", "declare", "default", "die", "do", "echo", "else", "elseif", "empty", "enddeclare", "endfor", "endforeach", "endif", "endswitch", "endwhile", "enum", "eval", "exit", "extends", "final", "finally", "fn", "for", "foreach", "function", "global", "goto", "if", "implements", "include", "include_once", "instanceof", "insteadof", "interface", "isset", "list", "match", "namespace", "new", "or", "parent", "print", "private", "protected", "public", "readonly", "require", "require_once", "return", "self", "static", "switch", "throw", "trait", "try", "unset", "use", "var", "while", "xor", "yield"], slashComments: true, hashComments: true, caseInsensitive: true},
+    sql: {keywords: ["add", "all", "alter", "and", "as", "asc", "begin", "between", "by", "case", "cast", "check", "column", "commit", "constraint", "create", "cross", "database", "default", "delete", "desc", "distinct", "drop", "else", "end", "except", "exists", "foreign", "from", "full", "function", "grant", "group", "having", "if", "in", "index", "inner", "insert", "intersect", "into", "is", "join", "key", "left", "like", "limit", "not", "null", "offset", "on", "or", "order", "outer", "over", "partition", "primary", "procedure", "references", "returning", "right", "rollback", "row", "select", "set", "table", "then", "top", "transaction", "trigger", "truncate", "union", "unique", "update", "use", "using", "values", "view", "when", "where", "window", "with"], dashComments: true, blockComments: true, caseInsensitive: true, nestedComments: true},
+    python: {keywords: ["and", "as", "assert", "async", "await", "break", "class", "continue", "def", "del", "elif", "else", "except", "finally", "for", "from", "global", "if", "import", "in", "is", "lambda", "nonlocal", "not", "or", "pass", "raise", "return", "try", "while", "with", "yield"], hashComments: true, tripleQuotes: true, literals: ["True", "False", "None"]},
+    bash: {keywords: ["if", "then", "else", "elif", "fi", "for", "while", "until", "do", "done", "case", "esac", "in", "function", "select", "time", "coproc", "export", "readonly", "local", "declare", "typeset", "unset", "return", "break", "continue", "source"], hashComments: true, dollarVariables: true, backticks: true, multilineQuotes: true},
+    jsx: {keywords: ["async", "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "from", "function", "get", "if", "import", "in", "instanceof", "let", "new", "of", "return", "set", "static", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield"], slashComments: true, templates: true, regex: true, jsx: true},
+    tsx: {keywords: ["async", "await", "break", "case", "catch", "class", "const", "continue", "debugger", "default", "delete", "do", "else", "export", "extends", "finally", "for", "from", "function", "get", "if", "import", "in", "instanceof", "let", "new", "of", "return", "set", "static", "super", "switch", "this", "throw", "try", "typeof", "var", "void", "while", "with", "yield", "abstract", "any", "as", "asserts", "bigint", "boolean", "constructor", "declare", "enum", "implements", "infer", "interface", "is", "keyof", "module", "namespace", "never", "number", "object", "private", "protected", "public", "readonly", "require", "satisfies", "string", "symbol", "type", "undefined", "unique", "unknown"], slashComments: true, templates: true, regex: true, jsx: true},
+    scss: {keywords: ["important", "inherit", "initial", "unset", "revert"], blockComments: true, css: true, slashComments: true, dollarVariables: true},
+    less: {keywords: ["important", "inherit", "initial", "unset", "revert"], blockComments: true, css: true, slashComments: true, atVariables: true},
+    jsonc: {keywords: [], slashComments: true, properties: true},
+    json5: {keywords: ["Infinity", "NaN"], slashComments: true, properties: true, multilineQuotes: true},
+    c: {keywords: ["auto", "break", "case", "char", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "goto", "if", "inline", "int", "long", "register", "restrict", "return", "short", "signed", "sizeof", "static", "struct", "switch", "typedef", "union", "unsigned", "void", "volatile", "while", "_Alignas", "_Alignof", "_Atomic", "_Bool", "_Complex", "_Generic", "_Imaginary", "_Noreturn", "_Static_assert", "_Thread_local"], slashComments: true, preprocessor: true},
+    cpp: {keywords: ["alignas", "alignof", "and", "and_eq", "asm", "auto", "bitand", "bitor", "bool", "break", "case", "catch", "char", "char8_t", "char16_t", "char32_t", "class", "compl", "concept", "const", "consteval", "constexpr", "constinit", "const_cast", "continue", "co_await", "co_return", "co_yield", "decltype", "default", "delete", "do", "double", "dynamic_cast", "else", "enum", "explicit", "export", "extern", "float", "for", "friend", "goto", "if", "inline", "int", "long", "mutable", "namespace", "new", "noexcept", "not", "not_eq", "operator", "or", "or_eq", "private", "protected", "public", "register", "reinterpret_cast", "requires", "return", "short", "signed", "sizeof", "static", "static_assert", "static_cast", "struct", "switch", "template", "this", "thread_local", "throw", "try", "typedef", "typeid", "typename", "union", "unsigned", "using", "virtual", "void", "volatile", "wchar_t", "while", "xor", "xor_eq"], slashComments: true, preprocessor: true},
+    csharp: {keywords: ["abstract", "as", "async", "await", "base", "bool", "break", "byte", "case", "catch", "char", "checked", "class", "const", "continue", "decimal", "default", "delegate", "do", "double", "dynamic", "else", "enum", "event", "explicit", "extern", "finally", "fixed", "float", "for", "foreach", "get", "global", "goto", "if", "implicit", "in", "init", "int", "interface", "internal", "is", "lock", "long", "namespace", "new", "not", "null", "object", "operator", "or", "out", "override", "params", "partial", "private", "protected", "public", "readonly", "record", "ref", "required", "return", "sbyte", "scoped", "sealed", "set", "short", "sizeof", "stackalloc", "static", "string", "struct", "switch", "this", "throw", "try", "typeof", "uint", "ulong", "unchecked", "unmanaged", "unsafe", "ushort", "using", "value", "var", "virtual", "void", "volatile", "when", "where", "while", "with", "yield"], slashComments: true, tripleQuotes: true, preprocessor: true},
+    java: {keywords: ["abstract", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "exports", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "instanceof", "int", "interface", "long", "module", "native", "new", "non-sealed", "open", "opens", "package", "permits", "private", "protected", "provides", "public", "record", "requires", "return", "sealed", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "throw", "throws", "to", "transient", "transitive", "try", "uses", "var", "void", "volatile", "when", "while", "with", "yield"], slashComments: true, tripleQuotes: true, annotations: true},
+    kotlin: {keywords: ["abstract", "actual", "annotation", "as", "break", "by", "catch", "class", "companion", "const", "constructor", "continue", "crossinline", "data", "delegate", "do", "dynamic", "else", "enum", "expect", "external", "field", "file", "final", "finally", "for", "fun", "get", "if", "import", "in", "infix", "init", "inline", "inner", "interface", "internal", "is", "lateinit", "noinline", "object", "open", "operator", "out", "override", "package", "param", "private", "property", "protected", "public", "receiver", "reified", "return", "sealed", "set", "setparam", "super", "suspend", "tailrec", "this", "throw", "try", "typealias", "typeof", "val", "value", "var", "vararg", "when", "where", "while"], slashComments: true, tripleQuotes: true, rawTriple: true, nestedComments: true, annotations: true},
+    scala: {keywords: ["abstract", "case", "catch", "class", "def", "do", "else", "enum", "export", "extends", "extension", "final", "finally", "for", "forSome", "given", "if", "implicit", "import", "infix", "inline", "lazy", "match", "new", "object", "opaque", "open", "override", "package", "private", "protected", "return", "sealed", "super", "then", "this", "throw", "trait", "transparent", "try", "type", "using", "val", "var", "while", "with", "yield"], slashComments: true, tripleQuotes: true, rawTriple: true, nestedComments: true, annotations: true},
+    swift: {keywords: ["actor", "any", "as", "associatedtype", "async", "await", "borrowing", "break", "case", "catch", "class", "consuming", "continue", "convenience", "copy", "default", "defer", "deinit", "didSet", "distributed", "do", "dynamic", "else", "enum", "extension", "fallthrough", "fileprivate", "final", "for", "func", "get", "guard", "if", "import", "in", "indirect", "infix", "init", "inout", "internal", "is", "isolated", "lazy", "let", "macro", "mutating", "nonisolated", "nonmutating", "open", "operator", "optional", "override", "package", "postfix", "precedencegroup", "prefix", "private", "protocol", "public", "repeat", "required", "rethrows", "return", "self", "Self", "set", "some", "static", "struct", "subscript", "super", "switch", "throws", "throwing", "try", "typealias", "unowned", "var", "weak", "where", "while", "willSet"], slashComments: true, tripleQuotes: true, nestedComments: true},
+    objectivec: {keywords: ["auto", "BOOL", "break", "case", "char", "class", "const", "continue", "default", "do", "double", "else", "enum", "extern", "float", "for", "id", "if", "in", "inline", "int", "long", "nonatomic", "nullable", "property", "protocol", "readonly", "readwrite", "register", "return", "self", "short", "signed", "sizeof", "static", "strong", "struct", "super", "switch", "synthesize", "typedef", "union", "unsigned", "void", "volatile", "weak", "while"], slashComments: true, preprocessor: true, annotations: true},
+    go: {keywords: ["break", "case", "chan", "const", "continue", "default", "defer", "else", "fallthrough", "for", "func", "go", "goto", "if", "import", "interface", "map", "package", "range", "return", "select", "struct", "switch", "type", "var"], slashComments: true, backticks: true, rawBackticks: true, multilineQuotes: true, literals: ["true", "false", "nil", "iota"]},
+    rust: {keywords: ["as", "async", "await", "become", "box", "break", "const", "continue", "crate", "dyn", "else", "enum", "extern", "final", "fn", "for", "gen", "if", "impl", "in", "let", "loop", "macro", "match", "mod", "move", "mut", "override", "priv", "pub", "ref", "return", "self", "Self", "static", "struct", "super", "trait", "try", "type", "typeof", "union", "unsafe", "unsized", "use", "virtual", "where", "while", "yield"], slashComments: true, nestedComments: true, lifetimes: true},
+    zig: {keywords: ["addrspace", "align", "allowzero", "and", "anyframe", "anytype", "asm", "async", "await", "break", "callconv", "catch", "comptime", "const", "continue", "defer", "else", "enum", "errdefer", "error", "export", "extern", "fn", "for", "if", "inline", "linksection", "noalias", "noinline", "nosuspend", "opaque", "or", "orelse", "packed", "pub", "resume", "return", "section", "struct", "suspend", "switch", "test", "threadlocal", "try", "union", "unreachable", "usingnamespace", "var", "volatile", "while"], slashComments: true, literals: ["true", "false", "null", "undefined", "unreachable"]},
+    dart: {keywords: ["abstract", "as", "assert", "async", "augment", "await", "base", "break", "case", "catch", "class", "const", "continue", "covariant", "default", "deferred", "do", "dynamic", "else", "enum", "export", "extends", "extension", "external", "factory", "final", "finally", "for", "Function", "get", "hide", "if", "implements", "import", "in", "interface", "is", "late", "library", "mixin", "new", "of", "on", "operator", "part", "required", "rethrow", "return", "sealed", "set", "show", "static", "super", "switch", "sync", "this", "throw", "try", "type", "typedef", "var", "void", "when", "while", "with", "yield"], slashComments: true, tripleQuotes: true, annotations: true},
+    d: {keywords: ["abstract", "alias", "align", "asm", "assert", "auto", "body", "bool", "break", "byte", "case", "cast", "catch", "cdouble", "cent", "cfloat", "char", "class", "const", "continue", "creal", "dchar", "debug", "default", "delegate", "delete", "deprecated", "do", "double", "else", "enum", "export", "extern", "final", "finally", "float", "for", "foreach", "foreach_reverse", "function", "goto", "idouble", "if", "ifloat", "immutable", "import", "in", "inout", "int", "interface", "invariant", "ireal", "is", "lazy", "long", "mixin", "module", "new", "nothrow", "out", "override", "package", "pragma", "private", "protected", "public", "pure", "real", "ref", "return", "scope", "shared", "short", "static", "struct", "super", "switch", "synchronized", "template", "this", "throw", "try", "typedef", "typeid", "typeof", "ubyte", "ucent", "uint", "ulong", "union", "unittest", "ushort", "version", "void", "volatile", "wchar", "while", "with", "__gshared"], slashComments: true, blocks: [["/*", "*/"], ["/+", "+/"]], nestedComments: true, backticks: true, rawBackticks: true},
+    groovy: {keywords: ["abstract", "as", "assert", "boolean", "break", "byte", "case", "catch", "char", "class", "const", "continue", "def", "default", "do", "double", "else", "enum", "extends", "final", "finally", "float", "for", "goto", "if", "implements", "import", "in", "instanceof", "int", "interface", "long", "native", "new", "package", "private", "protected", "public", "return", "short", "static", "strictfp", "super", "switch", "synchronized", "this", "threadsafe", "throw", "throws", "trait", "transient", "try", "var", "void", "volatile", "while"], slashComments: true, tripleQuotes: true},
+    ruby: {keywords: ["BEGIN", "END", "alias", "and", "begin", "break", "case", "class", "def", "defined", "do", "else", "elsif", "end", "ensure", "for", "if", "in", "module", "next", "not", "or", "redo", "rescue", "retry", "return", "self", "super", "then", "undef", "unless", "until", "when", "while", "yield"], hashComments: true, heredoc: true, literals: ["true", "false", "nil", "__FILE__", "__LINE__"]},
+    perl: {keywords: ["and", "cmp", "continue", "default", "do", "else", "elsif", "eq", "eval", "for", "foreach", "ge", "given", "goto", "grep", "gt", "if", "last", "le", "local", "lt", "map", "my", "ne", "next", "no", "not", "or", "our", "package", "print", "redo", "require", "return", "say", "scalar", "sort", "state", "sub", "unless", "until", "use", "when", "while", "xor"], hashComments: true, dollarVariables: true, atVariables: true, percentVariables: true, backticks: true},
+    lua: {keywords: ["and", "break", "do", "else", "elseif", "end", "for", "function", "goto", "if", "in", "local", "not", "or", "repeat", "return", "then", "until", "while"], dashComments: true, literals: ["true", "false", "nil"]},
+    r: {keywords: ["break", "else", "for", "function", "if", "in", "next", "repeat", "return", "switch", "while"], hashComments: true, backticks: true, multilineQuotes: true, literals: ["TRUE", "FALSE", "NULL", "NA", "NaN", "Inf", "NA_integer_", "NA_real_", "NA_character_", "NA_complex_"]},
+    julia: {keywords: ["abstract", "baremodule", "begin", "break", "catch", "const", "continue", "do", "else", "elseif", "end", "export", "finally", "for", "function", "global", "if", "import", "in", "isa", "let", "local", "macro", "module", "mutable", "outer", "primitive", "public", "quote", "return", "struct", "try", "type", "using", "where", "while"], hashComments: true, blocks: [["#=", "=#"]], nestedComments: true, tripleQuotes: true, multilineQuotes: true, literals: ["true", "false", "nothing", "missing", "Inf", "NaN"]},
+    matlab: {keywords: ["arguments", "break", "case", "catch", "classdef", "continue", "else", "elseif", "end", "enumeration", "events", "for", "function", "global", "if", "methods", "otherwise", "parfor", "persistent", "properties", "return", "spmd", "switch", "try", "while"], lineComments: ["%"], blocks: [["%{", "%}"]], doubledQuotes: true, multilineQuotes: true},
+    powershell: {keywords: ["begin", "break", "catch", "class", "clean", "continue", "data", "define", "do", "dynamicparam", "else", "elseif", "end", "enum", "exit", "filter", "finally", "for", "foreach", "from", "function", "if", "in", "param", "process", "return", "switch", "throw", "trap", "try", "until", "using", "var", "while", "workflow"], hashComments: true, blocks: [["<#", "#>"]], caseInsensitive: true, dollarVariables: true, hyphenated: true, doubledQuotes: true, multilineQuotes: true},
+    batch: {keywords: ["assoc", "break", "call", "cd", "chdir", "cls", "color", "copy", "date", "del", "dir", "do", "echo", "else", "endlocal", "erase", "exit", "for", "ftype", "goto", "if", "in", "md", "mkdir", "move", "not", "path", "pause", "popd", "prompt", "pushd", "rd", "rem", "ren", "rename", "rmdir", "set", "setlocal", "shift", "start", "time", "title", "type", "ver", "verify", "vol"], lineStartComments: ["rem", "::"], caseInsensitive: true, percentVariables: true, singleQuotes: false},
+    awk: {keywords: ["BEGIN", "END", "BEGINFILE", "ENDFILE", "break", "case", "continue", "default", "delete", "do", "else", "exit", "for", "function", "getline", "if", "in", "next", "nextfile", "print", "printf", "return", "switch", "while"], hashComments: true, dollarVariables: true, regex: true},
+    haskell: { apostropheIdentifiers: true,keywords: ["as", "case", "class", "data", "default", "deriving", "do", "else", "family", "forall", "foreign", "hiding", "if", "import", "in", "infix", "infixl", "infixr", "instance", "let", "mdo", "module", "newtype", "of", "pattern", "qualified", "rec", "role", "safe", "then", "type", "unsafe", "where"], dashComments: true, blocks: [["{-", "-}"]], nestedComments: true},
+    elixir: {keywords: ["after", "alias", "and", "case", "catch", "cond", "def", "defdelegate", "defexception", "defguard", "defguardp", "defimpl", "defmacro", "defmacrop", "defmodule", "defp", "defprotocol", "defstruct", "do", "else", "end", "fn", "for", "if", "import", "in", "not", "or", "quote", "raise", "receive", "require", "rescue", "super", "throw", "try", "unless", "unquote", "unquote_splicing", "use", "when", "with"], hashComments: true, tripleQuotes: true, symbols: true, literals: ["true", "false", "nil"]},
+    erlang: {keywords: ["after", "and", "andalso", "band", "begin", "bnot", "bor", "bsl", "bsr", "bxor", "case", "catch", "cond", "div", "end", "fun", "if", "let", "maybe", "not", "of", "or", "orelse", "receive", "rem", "try", "when", "xor"], lineComments: ["%"], literals: ["true", "false", "undefined"]},
+    fsharp: { apostropheIdentifiers: true,keywords: ["abstract", "and", "as", "assert", "async", "base", "begin", "class", "default", "delegate", "do", "done", "downcast", "downto", "elif", "else", "end", "exception", "extern", "false", "finally", "fixed", "for", "fun", "function", "global", "if", "in", "inherit", "inline", "interface", "internal", "lazy", "let", "match", "member", "module", "mutable", "namespace", "new", "not", "null", "of", "open", "or", "override", "private", "public", "rec", "return", "select", "static", "struct", "then", "to", "true", "try", "type", "upcast", "use", "val", "void", "when", "while", "with", "yield"], slashComments: true, blocks: [["(*", "*)"]], nestedComments: true, tripleQuotes: true, lifetimes: true},
+    ocaml: { apostropheIdentifiers: true,keywords: ["and", "as", "assert", "asr", "begin", "class", "constraint", "do", "done", "downto", "else", "end", "exception", "external", "false", "for", "fun", "function", "functor", "if", "in", "include", "inherit", "initializer", "land", "lazy", "let", "lor", "lsl", "lsr", "lxor", "match", "method", "mod", "module", "mutable", "new", "nonrec", "object", "of", "open", "or", "private", "rec", "sig", "struct", "then", "to", "true", "try", "type", "val", "virtual", "when", "while", "with"], blocks: [["(*", "*)"]], nestedComments: true, lifetimes: true},
+    clojure: {keywords: ["and", "as", "as->", "binding", "case", "catch", "comment", "cond", "cond->", "cond->>", "condp", "def", "defmacro", "defmethod", "defmulti", "defn", "defn-", "defonce", "defprotocol", "defrecord", "deftype", "do", "doseq", "dotimes", "doto", "else", "extend", "extend-protocol", "extend-type", "finally", "fn", "for", "if", "if-let", "if-not", "if-some", "import", "in-ns", "let", "letfn", "loop", "macroexpand", "new", "ns", "or", "quote", "recur", "refer-clojure", "reify", "require", "set!", "some->", "some->>", "throw", "time", "try", "var", "when", "when-first", "when-let", "when-not", "while", "with-open"], lineComments: [";"], singleQuotes: false, symbols: true, hyphenated: true, literals: ["true", "false", "nil"]},
+    lisp: {keywords: ["and", "block", "case", "catch", "cond", "defclass", "defconstant", "defgeneric", "define-condition", "defmacro", "defmethod", "defpackage", "defparameter", "defstruct", "defun", "defvar", "do", "do*", "dolist", "dotimes", "ecase", "eval-when", "flet", "function", "go", "if", "labels", "lambda", "let", "let*", "load-time-value", "locally", "loop", "macrolet", "multiple-value-bind", "multiple-value-call", "or", "progn", "progv", "quote", "return", "return-from", "setf", "setq", "tagbody", "the", "throw", "typecase", "unless", "unwind-protect", "when"], lineComments: [";"], blocks: [["#|", "|#"]], nestedComments: true, singleQuotes: false, caseInsensitive: true, hyphenated: true, symbols: true, literals: ["nil", "t"]},
+    scheme: {keywords: ["and", "begin", "case", "cond", "define", "define-record-type", "define-syntax", "delay", "do", "else", "guard", "if", "import", "lambda", "let", "let*", "let-values", "letrec", "or", "parameterize", "quasiquote", "quote", "set!", "syntax-rules", "unless", "unquote", "when"], lineComments: [";"], blocks: [["#|", "|#"]], nestedComments: true, singleQuotes: false, hyphenated: true, symbols: true},
+    racket: {keywords: ["and", "begin", "begin0", "case", "class", "cond", "define", "define-contract", "define-for-syntax", "define-syntax", "define-syntax-rule", "delay", "do", "else", "for", "for*", "for/list", "for/fold", "if", "lambda", "let", "let*", "letrec", "match", "module", "module+", "module*", "or", "parameterize", "provide", "quasiquote", "quote", "require", "set!", "struct", "syntax", "unless", "unquote", "when", "with-handlers"], lineComments: [";"], blocks: [["#|", "|#"]], nestedComments: true, singleQuotes: false, hyphenated: true, symbols: true},
+    nim: {keywords: ["addr", "and", "as", "asm", "bind", "block", "break", "case", "cast", "concept", "const", "continue", "converter", "defer", "discard", "distinct", "div", "do", "elif", "else", "end", "enum", "except", "export", "finally", "for", "from", "func", "generic", "if", "import", "in", "include", "interface", "is", "isnot", "iterator", "let", "macro", "method", "mixin", "mod", "nil", "not", "notin", "object", "of", "or", "out", "proc", "ptr", "raise", "ref", "return", "shl", "shr", "static", "template", "try", "tuple", "type", "using", "var", "when", "while", "with", "without", "xor", "yield"], hashComments: true, blocks: [["#[", "]#"]], nestedComments: true, tripleQuotes: true, literals: ["true", "false", "nil"]},
+    crystal: {keywords: ["abstract", "alias", "annotation", "as", "asm", "begin", "break", "case", "class", "def", "do", "else", "elsif", "end", "ensure", "enum", "extend", "for", "fun", "if", "in", "include", "instance_sizeof", "is_a", "lib", "macro", "module", "next", "nil", "of", "out", "pointerof", "private", "protected", "require", "rescue", "responds_to", "return", "select", "self", "sizeof", "struct", "super", "then", "typeof", "uninitialized", "union", "unless", "until", "verbatim", "when", "while", "with", "yield"], hashComments: true, tripleQuotes: true, heredoc: true, literals: ["true", "false", "nil"]},
+    pascal: {keywords: ["and", "array", "as", "asm", "begin", "case", "class", "const", "constructor", "destructor", "div", "do", "downto", "else", "end", "except", "exports", "file", "finalization", "finally", "for", "function", "goto", "if", "implementation", "in", "inherited", "initialization", "inline", "interface", "is", "label", "library", "mod", "nil", "not", "object", "of", "on", "operator", "or", "out", "packed", "procedure", "program", "property", "raise", "record", "repeat", "resourcestring", "set", "shl", "shr", "string", "then", "threadvar", "to", "try", "type", "unit", "until", "uses", "var", "while", "with", "xor"], slashComments: true, blocks: [["(*", "*)"], ["{", "}"]], caseInsensitive: true, doubledQuotes: true},
+    fortran: {keywords: ["abstract", "allocatable", "allocate", "assignment", "associate", "asynchronous", "backspace", "bind", "block", "call", "case", "character", "class", "close", "codimension", "common", "complex", "contains", "continue", "cycle", "data", "deallocate", "deferred", "dimension", "do", "double", "elemental", "else", "elseif", "elsewhere", "end", "enddo", "endif", "entry", "enum", "equivalence", "error", "exit", "external", "final", "flush", "forall", "format", "function", "generic", "goto", "if", "implicit", "import", "impure", "in", "include", "inquire", "integer", "intent", "interface", "intrinsic", "logical", "module", "namelist", "non_intrinsic", "non_overridable", "nopass", "nullify", "only", "open", "operator", "optional", "out", "parameter", "pass", "pause", "pointer", "precision", "print", "private", "procedure", "program", "protected", "public", "pure", "read", "real", "recursive", "result", "return", "rewind", "save", "select", "sequence", "stop", "submodule", "subroutine", "target", "then", "type", "use", "value", "volatile", "wait", "where", "while", "write"], lineComments: ["!"], caseInsensitive: true, doubledQuotes: true, literals: ["true", "false"]},
+    cobol: {keywords: ["accept", "access", "add", "advancing", "after", "all", "alphabet", "also", "alter", "alternate", "and", "any", "are", "area", "areas", "ascending", "assign", "at", "author", "before", "binary", "blank", "block", "by", "call", "cancel", "cd", "cf", "ch", "character", "clock-units", "close", "cobol", "code", "code-set", "collating", "column", "com-reg", "comma", "common", "communication", "comp", "compute", "configuration", "contains", "content", "continue", "control", "controls", "converting", "copy", "corr", "corresponding", "count", "currency", "data", "date", "date-written", "day", "db", "de", "debug-contents", "debug-item", "debug-line", "debug-name", "debug-sub-1", "debug-sub-2", "debug-sub-3", "debugging", "decimal-point", "declaratives", "delete", "delimited", "delimiter", "depending", "descending", "destination", "detail", "disable", "display", "divide", "division", "down", "duplicates", "dynamic", "egcs", "else", "emi", "enable", "end", "end-add", "end-call", "end-compute", "end-delete", "end-divide", "end-evaluate", "end-if", "end-multiply", "end-perform", "end-read", "end-return", "end-rewrite", "end-search", "end-start", "end-string", "end-subtract", "end-unstring", "end-write", "end-of-page", "enter", "environment", "eop", "equal", "error", "evaluate", "every", "exception", "exit", "extend", "external", "false", "fd", "file", "file-control", "filler", "final", "first", "footing", "for", "from", "giving", "global", "greater", "group", "heading", "high-value", "identification", "if", "in", "index", "indexed", "indicate", "initial", "initialize", "initiate", "input", "input-output", "inspect", "install", "into", "invalid", "is", "just", "justified", "key", "label", "last", "leading", "left", "length", "less", "limit", "limits", "linage", "line", "lines", "linkage", "lock", "memory", "merge", "message", "mode", "modules", "move", "multiple", "multiply", "native", "negative", "next", "no", "not", "number", "numeric", "object-computer", "occurs", "of", "off", "omitted", "on", "open", "optional", "or", "order", "organization", "other", "output", "overflow", "packed-decimal", "padding", "page", "perform", "pf", "ph", "pic", "picture", "plus", "pointer", "position", "positive", "printing", "procedure", "procedures", "proceed", "process", "processing", "program", "program-id", "purge", "queue", "quote", "random", "rd", "read", "receive", "record", "recording", "records", "redefines", "reel", "reference", "references", "relative", "release", "remainder", "removal", "renames", "replace", "replacing", "report", "reporting", "reports", "rerun", "reserve", "reset", "return", "returning", "reversed", "rewind", "rewrite", "rf", "rh", "right", "rounded", "run", "same", "sd", "search", "section", "security", "segment", "segment-limit", "select", "send", "sentence", "separate", "sequence", "sequential", "set", "sign", "size", "sort", "sort-merge", "source", "source-computer", "space", "special-names", "standard", "standard-1", "standard-2", "start", "status", "stop", "string", "sub-queue-1", "sub-queue-2", "sub-queue-3", "subtract", "sum", "suppress", "symbolic", "sync", "synchronized", "table", "tally", "tallying", "tape", "terminal", "terminate", "test", "text", "than", "then", "through", "thru", "time", "times", "to", "top", "trailing", "true", "type", "unit", "unstring", "until", "up", "upon", "usage", "use", "using", "value", "values", "varying", "when", "with", "words", "working-storage", "write", "zero"], lineComments: ["*>"], caseInsensitive: true, hyphenated: true, doubledQuotes: true},
+    vbnet: {keywords: ["addhandler", "addressof", "alias", "and", "andalso", "as", "async", "await", "boolean", "byref", "byte", "byval", "call", "case", "catch", "cbool", "cbyte", "cchar", "cdate", "cdec", "cdbl", "char", "cint", "class", "clng", "cobj", "const", "continue", "csbyte", "cshort", "csng", "cstr", "ctype", "cuint", "culng", "cushort", "date", "decimal", "declare", "default", "delegate", "dim", "directcast", "do", "double", "each", "else", "elseif", "end", "enum", "erase", "error", "event", "exit", "false", "finally", "for", "friend", "function", "get", "gettype", "getxmlnamespace", "global", "gosub", "goto", "handles", "if", "implements", "imports", "in", "inherits", "integer", "interface", "is", "isnot", "let", "lib", "like", "long", "loop", "me", "mod", "module", "mustinherit", "mustoverride", "mybase", "myclass", "namespace", "narrowing", "new", "next", "not", "nothing", "notinheritable", "notoverridable", "object", "of", "on", "operator", "option", "optional", "or", "orelse", "out", "overloads", "overridable", "overrides", "paramarray", "partial", "private", "property", "protected", "public", "raiseevent", "readonly", "redim", "rem", "removehandler", "resume", "return", "sbyte", "select", "set", "shadows", "shared", "short", "single", "static", "step", "stop", "string", "structure", "sub", "synclock", "then", "throw", "to", "true", "try", "trycast", "typeof", "uinteger", "ulong", "ushort", "using", "variant", "wend", "when", "while", "widening", "with", "withevents", "writeonly", "xor", "yield"], lineComments: ["'"], caseInsensitive: true, singleQuotes: false, doubledQuotes: true, preprocessor: true},
+    ada: {keywords: ["abort", "abs", "abstract", "accept", "access", "aliased", "all", "and", "array", "at", "begin", "body", "case", "constant", "declare", "delay", "delta", "digits", "do", "else", "elsif", "end", "entry", "exception", "exit", "for", "function", "generic", "goto", "if", "in", "interface", "is", "limited", "loop", "mod", "new", "not", "null", "of", "or", "others", "out", "overriding", "package", "parallel", "pragma", "private", "procedure", "protected", "raise", "range", "record", "rem", "renames", "requeue", "return", "reverse", "select", "separate", "some", "subtype", "synchronized", "tagged", "task", "terminate", "then", "type", "until", "use", "when", "while", "with", "xor"], dashComments: true, caseInsensitive: true, doubledQuotes: true, lifetimes: true},
+    solidity: {keywords: ["abstract", "address", "anonymous", "as", "assembly", "bool", "break", "bytes", "calldata", "catch", "constant", "constructor", "continue", "contract", "delete", "do", "else", "emit", "enum", "error", "event", "external", "fallback", "fixed", "for", "from", "function", "if", "immutable", "import", "indexed", "interface", "internal", "is", "library", "mapping", "memory", "modifier", "new", "override", "payable", "pragma", "private", "public", "pure", "receive", "return", "returns", "storage", "string", "struct", "super", "this", "throw", "try", "type", "ufixed", "unchecked", "using", "var", "view", "virtual", "while"], slashComments: true},
+    verilog: {keywords: ["always", "and", "assign", "automatic", "begin", "buf", "bufif0", "bufif1", "case", "casex", "casez", "cell", "cmos", "config", "deassign", "default", "defparam", "design", "disable", "edge", "else", "end", "endcase", "endconfig", "endfunction", "endgenerate", "endmodule", "endprimitive", "endspecify", "endtable", "endtask", "event", "for", "force", "forever", "fork", "function", "generate", "genvar", "highz0", "highz1", "if", "ifnone", "incdir", "include", "initial", "inout", "input", "instance", "integer", "join", "large", "liblist", "library", "localparam", "macromodule", "medium", "module", "nand", "negedge", "nmos", "nor", "noshowcancelled", "not", "notif0", "notif1", "or", "output", "parameter", "pmos", "posedge", "primitive", "pull0", "pull1", "pulldown", "pullup", "pulsestyle_onevent", "pulsestyle_ondetect", "rcmos", "real", "realtime", "reg", "release", "repeat", "rnmos", "rpmos", "rtran", "rtranif0", "rtranif1", "scalared", "showcancelled", "signed", "small", "specify", "specparam", "strong0", "strong1", "supply0", "supply1", "table", "task", "time", "tran", "tranif0", "tranif1", "tri", "tri0", "tri1", "triand", "trior", "trireg", "unsigned", "use", "vectored", "wait", "wand", "weak0", "weak1", "while", "wire", "wor", "xnor", "xor"], slashComments: true},
+    systemverilog: {keywords: ["always", "and", "assign", "automatic", "begin", "buf", "bufif0", "bufif1", "case", "casex", "casez", "cell", "cmos", "config", "deassign", "default", "defparam", "design", "disable", "edge", "else", "end", "endcase", "endconfig", "endfunction", "endgenerate", "endmodule", "endprimitive", "endspecify", "endtable", "endtask", "event", "for", "force", "forever", "fork", "function", "generate", "genvar", "highz0", "highz1", "if", "ifnone", "incdir", "include", "initial", "inout", "input", "instance", "integer", "join", "large", "liblist", "library", "localparam", "macromodule", "medium", "module", "nand", "negedge", "nmos", "nor", "noshowcancelled", "not", "notif0", "notif1", "or", "output", "parameter", "pmos", "posedge", "primitive", "pull0", "pull1", "pulldown", "pullup", "pulsestyle_onevent", "pulsestyle_ondetect", "rcmos", "real", "realtime", "reg", "release", "repeat", "rnmos", "rpmos", "rtran", "rtranif0", "rtranif1", "scalared", "showcancelled", "signed", "small", "specify", "specparam", "strong0", "strong1", "supply0", "supply1", "table", "task", "time", "tran", "tranif0", "tranif1", "tri", "tri0", "tri1", "triand", "trior", "trireg", "unsigned", "use", "vectored", "wait", "wand", "weak0", "weak1", "while", "wire", "wor", "xnor", "xor", "accept_on", "alias", "always_comb", "always_ff", "always_latch", "assert", "assume", "before", "bind", "bins", "binsof", "bit", "break", "byte", "chandle", "checker", "class", "clocking", "const", "constraint", "context", "continue", "cover", "covergroup", "coverpoint", "cross", "dist", "do", "endchecker", "endclass", "endclocking", "endgroup", "endinterface", "endpackage", "endprogram", "endproperty", "endsequence", "enum", "expect", "export", "extends", "extern", "final", "first_match", "foreach", "forkjoin", "iff", "ignore_bins", "illegal_bins", "implements", "implies", "import", "inside", "int", "interconnect", "interface", "intersect", "join_any", "join_none", "let", "local", "logic", "longint", "matches", "modport", "nettype", "new", "null", "package", "packed", "priority", "program", "property", "protected", "pure", "rand", "randc", "randcase", "randsequence", "ref", "return", "sequence", "shortint", "shortreal", "solve", "static", "string", "struct", "super", "sync_accept_on", "sync_reject_on", "tagged", "this", "throughout", "timeprecision", "timeunit", "type", "typedef", "union", "unique", "unique0", "var", "virtual", "void", "wait_order", "wildcard", "with", "within"], slashComments: true},
+    vhdl: {keywords: ["abs", "access", "after", "alias", "all", "and", "architecture", "array", "assert", "assume", "attribute", "begin", "block", "body", "buffer", "bus", "case", "component", "configuration", "constant", "context", "cover", "default", "disconnect", "downto", "else", "elsif", "end", "entity", "exit", "fair", "file", "for", "force", "function", "generate", "generic", "group", "guarded", "if", "impure", "in", "inertial", "inout", "is", "label", "library", "linkage", "literal", "loop", "map", "mod", "nand", "new", "next", "nor", "not", "null", "of", "on", "open", "or", "others", "out", "package", "parameter", "port", "postponed", "procedure", "process", "property", "protected", "pure", "range", "record", "register", "reject", "release", "rem", "report", "restrict", "return", "rol", "ror", "select", "sequence", "severity", "shared", "signal", "sla", "sll", "sra", "srl", "strong", "subtype", "then", "to", "transport", "type", "unaffected", "units", "until", "use", "variable", "vmode", "vprop", "vunit", "wait", "when", "while", "with", "xnor", "xor"], dashComments: true, caseInsensitive: true, doubledQuotes: true, lifetimes: true},
+    glsl: {keywords: ["attribute", "bool", "break", "buffer", "bvec2", "bvec3", "bvec4", "case", "centroid", "coherent", "const", "continue", "default", "discard", "dmat2", "dmat3", "dmat4", "do", "double", "dvec2", "dvec3", "dvec4", "else", "flat", "float", "for", "highp", "if", "in", "inout", "int", "invariant", "ivec2", "ivec3", "ivec4", "layout", "lowp", "mat2", "mat3", "mat4", "mediump", "noperspective", "out", "patch", "precision", "readonly", "restrict", "return", "sampler2D", "samplerCube", "shared", "smooth", "struct", "subroutine", "switch", "uint", "uniform", "uvec2", "uvec3", "uvec4", "varying", "vec2", "vec3", "vec4", "void", "volatile", "while", "writeonly"], slashComments: true, preprocessor: true},
+    hlsl: {keywords: ["asm", "bool", "break", "Buffer", "ByteAddressBuffer", "case", "cbuffer", "centroid", "class", "column_major", "compile", "const", "continue", "default", "discard", "do", "double", "else", "export", "extern", "false", "float", "float2", "float3", "float4", "float4x4", "for", "groupshared", "half", "if", "in", "inline", "inout", "int", "interface", "line", "lineadj", "linear", "matrix", "namespace", "nointerpolation", "noperspective", "out", "packoffset", "pass", "precise", "RasterizerOrderedBuffer", "register", "return", "row_major", "RWBuffer", "RWByteAddressBuffer", "RWStructuredBuffer", "RWTexture2D", "sample", "sampler", "sampler_state", "SamplerState", "shared", "snorm", "stateblock", "static", "string", "struct", "StructuredBuffer", "switch", "tbuffer", "technique", "technique10", "technique11", "texture", "Texture2D", "Texture3D", "TextureCube", "true", "typedef", "uint", "uniform", "unorm", "unsigned", "vector", "vertexfragment", "void", "volatile", "while"], slashComments: true, preprocessor: true},
+    wgsl: {keywords: ["alias", "array", "atomic", "bitcast", "bool", "break", "case", "const", "const_assert", "continue", "continuing", "default", "diagnostic", "discard", "else", "enable", "f16", "f32", "false", "fn", "for", "i32", "if", "let", "loop", "mat2x2", "mat3x3", "mat4x4", "override", "ptr", "requires", "return", "sampler", "sampler_comparison", "struct", "switch", "texture_2d", "texture_3d", "texture_cube", "true", "u32", "var", "vec2", "vec3", "vec4", "while"], slashComments: true, nestedComments: true, annotations: true},
+    graphql: {keywords: ["query", "mutation", "subscription", "fragment", "on", "schema", "scalar", "type", "interface", "union", "enum", "input", "extend", "directive", "implements", "repeatable"], hashComments: true, tripleQuotes: true, dollarVariables: true},
+    protobuf: {keywords: ["syntax", "edition", "import", "weak", "public", "package", "option", "optional", "required", "repeated", "oneof", "map", "reserved", "extensions", "to", "max", "message", "enum", "service", "rpc", "stream", "returns", "group", "extend"], slashComments: true},
+    toml: {keywords: [], hashComments: true, tripleQuotes: true, properties: true, doubledQuotes: false, multilineQuotes: true, literals: ["true", "false", "inf", "nan"]},
+    ini: {keywords: [], hashComments: true, lineComments: [";"], properties: true, multilineQuotes: true},
+    dockerfile: {keywords: ["add", "arg", "cmd", "copy", "entrypoint", "env", "expose", "from", "healthcheck", "label", "maintainer", "onbuild", "run", "shell", "stopsignal", "user", "volume", "workdir", "as"], hashComments: true, caseInsensitive: true, dollarVariables: true, hyphenated: true},
+    makefile: {keywords: ["define", "endef", "undefine", "ifdef", "ifndef", "ifeq", "ifneq", "else", "endif", "include", "sinclude", "override", "export", "unexport", "private", "vpath"], hashComments: true, dollarVariables: true, properties: true, hyphenated: true},
+    cmake: {keywords: ["block", "break", "cmake_minimum_required", "continue", "else", "elseif", "enable_language", "endblock", "endforeach", "endfunction", "endif", "endmacro", "endwhile", "foreach", "function", "if", "include", "macro", "message", "option", "project", "return", "set", "unset", "while", "add_executable", "add_library", "target_link_libraries", "target_include_directories", "target_compile_features", "find_package"], hashComments: true, caseInsensitive: true, dollarVariables: true},
+    nginx: {keywords: ["server", "location", "http", "events", "upstream", "stream", "map", "geo", "if", "else", "include", "listen", "server_name", "root", "index", "return", "rewrite", "proxy_pass", "try_files", "access_log", "error_log", "set"], hashComments: true, dollarVariables: true, hyphenated: true},
+    hcl: {keywords: ["variable", "output", "resource", "data", "provider", "terraform", "module", "locals", "required_providers", "backend", "dynamic", "for", "in", "if"], slashComments: true, hashComments: true, properties: true, hyphenated: true, multilineQuotes: true},
+    markdown: {keywords: []},
+    diff: {keywords: []},
+    assembly: {keywords: ["add", "and", "call", "cmp", "db", "dd", "dec", "dq", "dw", "extern", "global", "inc", "int", "je", "jg", "jge", "jl", "jle", "jmp", "jne", "lea", "loop", "mov", "movabs", "movq", "movl", "nop", "not", "or", "pop", "push", "ret", "section", "shl", "shr", "sub", "syscall", "test", "xor"], lineComments: [";"], hashComments: true, caseInsensitive: true, percentVariables: true, properties: true},
+    v: {keywords: ["as", "asm", "assert", "atomic", "break", "const", "continue", "defer", "else", "enum", "extern", "false", "fn", "for", "go", "goto", "if", "import", "in", "interface", "is", "isreftype", "lock", "match", "module", "mut", "none", "offsetof", "or", "pub", "return", "rlock", "select", "shared", "sizeof", "spawn", "static", "struct", "true", "type", "typeof", "union", "unsafe", "volatile", "__global"], slashComments: true, backticks: true, rawBackticks: true, literals: ["true", "false", "none"]},
+    odin: {keywords: ["asm", "auto_cast", "bit_field", "bit_set", "break", "case", "cast", "context", "continue", "defer", "distinct", "do", "dynamic", "else", "enum", "fallthrough", "for", "foreign", "if", "import", "in", "map", "matrix", "nil", "no_inline", "or_else", "or_return", "package", "proc", "relative", "return", "struct", "switch", "transmute", "typeid", "union", "using", "when", "where"], slashComments: true, nestedComments: true, literals: ["true", "false", "nil"]},
+    gdscript: {keywords: ["and", "as", "assert", "await", "break", "breakpoint", "class", "class_name", "const", "continue", "elif", "else", "enum", "extends", "for", "func", "if", "in", "is", "match", "not", "or", "pass", "preload", "return", "self", "signal", "static", "super", "var", "void", "while"], hashComments: true, tripleQuotes: true, annotations: true, literals: ["true", "false", "null", "PI", "TAU", "INF", "NAN"]},
+    gml: {keywords: ["and", "as", "begin", "break", "case", "catch", "constructor", "continue", "default", "delete", "div", "do", "else", "end", "enum", "exit", "finally", "for", "function", "globalvar", "if", "in", "mod", "new", "not", "or", "repeat", "return", "static", "struct", "switch", "throw", "try", "until", "var", "while", "with", "xor"], slashComments: true},
   };
-  const aliases = { js: "javascript", ts: "typescript", htm: "html", yml: "yaml", py: "python", sh: "bash", shell: "bash", text: "plain", txt: "plain" };
-  byCODEviewer.languages = Object.freeze(["html", "css", "javascript", "json", "xml", "yaml", "php", "sql", "python", "bash", "typescript", "plain"]);
+  for (const profile of Object.values(profiles)) {
+    profile.keywords = new Set(profile.keywords);
+    profile.blocks ||= profile.slashComments || profile.blockComments ? [["/*", "*/"]] : [];
+    profile.lineComments ||= [];
+  }
+  // prettier-ignore
+  const aliases = {"js": "javascript", "mjs": "javascript", "cjs": "javascript", "ts": "typescript", "htm": "html", "svg": "xml", "xhtml": "xml", "yml": "yaml", "py": "python", "pyw": "python", "sh": "bash", "shell": "bash", "zsh": "bash", "text": "plain", "txt": "plain", "plaintext": "plain", "c++": "cpp", "cc": "cpp", "cxx": "cpp", "hpp": "cpp", "h": "c", "c#": "csharp", "cs": "csharp", "kt": "kotlin", "kts": "kotlin", "sc": "scala", "objc": "objectivec", "objective-c": "objectivec", "m": "objectivec", "rs": "rust", "golang": "go", "rb": "ruby", "pl": "perl", "pm": "perl", "jl": "julia", "ps1": "powershell", "psm1": "powershell", "pwsh": "powershell", "bat": "batch", "cmd": "batch", "hs": "haskell", "ex": "elixir", "exs": "elixir", "erl": "erlang", "hrl": "erlang", "f#": "fsharp", "fs": "fsharp", "fsx": "fsharp", "ml": "ocaml", "mli": "ocaml", "clj": "clojure", "cljs": "clojure", "cljc": "clojure", "edn": "clojure", "commonlisp": "lisp", "common-lisp": "lisp", "cl": "lisp", "scm": "scheme", "ss": "scheme", "rkt": "racket", "nims": "nim", "cr": "crystal", "pas": "pascal", "pp": "pascal", "f": "fortran", "f90": "fortran", "f95": "fortran", "cob": "cobol", "cpy": "cobol", "vb": "vbnet", "visualbasic": "vbnet", "ada95": "ada", "ads": "ada", "adb": "ada", "sol": "solidity", "sv": "systemverilog", "svh": "systemverilog", "vhd": "vhdl", "vert": "glsl", "frag": "glsl", "shader": "hlsl", "gql": "graphql", "proto": "protobuf", "properties": "ini", "cfg": "ini", "conf": "ini", "docker": "dockerfile", "make": "makefile", "mk": "makefile", "cmake.in": "cmake", "terraform": "hcl", "tf": "hcl", "md": "markdown", "mdown": "markdown", "patch": "diff", "asm": "assembly", "nasm": "assembly", "vlang": "v", "gd": "gdscript", "gamemaker": "gml"};
+  byCODEviewer.languages = Object.freeze(["html", "xml", ...Object.keys(profiles), "plain"]);
 
   // --- STATE ---
   const instances = new WeakMap();
@@ -592,29 +356,37 @@
   // --- PARSING ---
   // Resolve supported aliases; unknown names deliberately fall back to uncolored source.
   const languageName = (value) => {
-    const name = String(value ?? "plain").toLowerCase();
-    return aliases[name] || (byCODEviewer.languages.includes(name) ? name : "plain");
+    const name = String(value ?? "plain")
+      .trim()
+      .toLowerCase();
+    return Object.hasOwn(aliases, name) ? aliases[name] : byCODEviewer.languages.includes(name) ? name : "plain";
   };
   const token = (type, text) => ({ type, text });
-  // Find a language-specific closing quote without interpreting comment markers inside strings.
+  // Quotes own comment markers and escaped delimiters until the matching language-specific close.
   const quotedEnd = (source, start, end, language) => {
-    const quote = source[start],
-      triple = language === "python" && source.startsWith(quote.repeat(3), start);
+    const profile = profiles[language] || {},
+      quote = source[start];
+    const triple = profile.tripleQuotes && source.startsWith(quote.repeat(3), start);
     const delimiter = triple ? quote.repeat(3) : quote;
+    const raw = (triple && profile.rawTriple) || (quote === "`" && profile.rawBackticks) || (language === "toml" && quote === "'");
     let i = start + delimiter.length;
     for (; i < end; i++) {
-      if (source[i] === "\\" && language !== "html" && !(language === "yaml" && quote === "'") && !(language === "bash" && quote === "'")) {
+      if (source[i] === "\\" && !raw && language !== "html" && language !== "powershell" && !(language === "yaml" && quote === "'") && !(language === "bash" && quote === "'")) {
+        i++;
+        continue;
+      }
+      if (language === "powershell" && source[i] === "`") {
         i++;
         continue;
       }
       if (source.startsWith(delimiter, i)) {
-        if (!triple && ["sql", "yaml"].includes(language) && source[i + 1] === quote) {
+        if (!triple && (profile.doubledQuotes || ["sql", "yaml"].includes(language)) && source[i + 1] === quote) {
           i++;
           continue;
         }
         return i + delimiter.length;
       }
-      if (!triple && source[i] === "\n" && !["yaml", "php", "bash", "sql", "html"].includes(language)) return i;
+      if (!triple && source[i] === "\n" && !profile.multilineQuotes && !["yaml", "php", "bash", "sql", "html"].includes(language)) return i;
     }
     return end;
   };
@@ -654,7 +426,7 @@
               const to = lineEnd(source, i, end);
               const line = source.slice(i, to).replace(/\r$/, "");
               i = to < end ? to + 1 : to;
-              if ((here.tabs ? line.replace(/^\t+/, "") : line) === here.label) break;
+              if ((here.indent ? line.trimStart() : here.tabs ? line.replace(/^\t+/, "") : line) === here.label) break;
             }
             yield token("string", source.slice(from, i));
           }
@@ -663,29 +435,74 @@
         }
         i++;
         while (i < end && /\s/.test(source[i]) && !(pendingHeredoc.length && source[i] === "\n")) i++;
+      } else if (language === "lua" && (source.startsWith("--[", i) || char === "[") && /^(?:--)?\[=*\[/.test(source.slice(i))) {
+        const opening = source.slice(i).match(/^(--)?\[(=*)\[/),
+          delimiter = `]${opening[2]}]`;
+        type = opening[1] ? "comment" : "string";
+        const close = source.indexOf(delimiter, i + opening[0].length);
+        i = close < 0 ? end : Math.min(end, close + delimiter.length);
+      } else if ((language === "rust" && /^(?:br|cr|r)#{0,255}"/.test(source.slice(i))) || (language === "swift" && char === "#" && /^#+"/.test(source.slice(i)))) {
+        const opening = language === "rust" ? source.slice(i).match(/^(?:br|cr|r)(#*)"/) : source.slice(i).match(/^(#+)("{3}|"{1})/);
+        const delimiter = (language === "swift" ? opening[2] : '"') + opening[1];
+        type = "string";
+        const close = source.indexOf(delimiter, i + opening[0].length);
+        i = close < 0 ? end : Math.min(end, close + delimiter.length);
+      } else if (language === "cpp" && /^(?:u8|u|U|L)?R"[^\s()\\]{0,16}\(/.test(source.slice(i))) {
+        const opening = source.slice(i).match(/^(?:u8|u|U|L)?R"([^\s()\\]{0,16})\(/),
+          delimiter = `)${opening[1]}"`;
+        type = "string";
+        const close = source.indexOf(delimiter, i + opening[0].length);
+        i = close < 0 ? end : Math.min(end, close + delimiter.length);
+      } else if (language === "csharp" && /^(?:\$*@|@\$|\$*)"/.test(source.slice(i)) && (/^(?:\$*@|@\$)"/.test(source.slice(i)) || /^\$*"{3,}/.test(source.slice(i)))) {
+        const opening = source.slice(i).match(/^(?:\$*@|@\$)"|^\$*("{3,})/);
+        const delimiter = opening[1] || '"';
+        type = "string";
+        i += opening[0].length;
+        while (i < end) {
+          if (source.startsWith(delimiter, i)) {
+            i += delimiter.length;
+            if (delimiter.length === 1 && source[i] === '"') {
+              i++;
+              continue;
+            }
+            break;
+          }
+          i++;
+        }
+      } else if (language === "powershell" && char === "@" && /^@['"]\r?\n/.test(source.slice(i))) {
+        const close = new RegExp(`^${source[i + 1]}@(?=\\r?$)`, "gm");
+        close.lastIndex = i + 2;
+        const match = close.exec(source);
+        type = "string";
+        i = match && match.index < end ? match.index + match[0].length : end;
+      } else if (profile.blocks.some(([opening]) => source.startsWith(opening, i))) {
+        const [opening, closing] = profile.blocks.find(([opening]) => source.startsWith(opening, i));
+        type = "comment";
+        i += opening.length;
+        let nesting = 1;
+        while (i < end && nesting) {
+          if (profile.nestedComments && (language !== "d" || opening === "/+") && source.startsWith(opening, i)) {
+            nesting++;
+            i += opening.length;
+          } else if (source.startsWith(closing, i)) {
+            nesting--;
+            i += closing.length;
+          } else i++;
+        }
       } else if (
         (profile.slashComments && char === "/" && next === "/") ||
         (profile.dashComments && char === "-" && next === "-") ||
-        (profile.hashComments && char === "#" && (language === "php" ? next !== "[" : language === "python" || i === 0 || /[\s;|&(]/.test(source[i - 1])))
+        (profile.hashComments && char === "#" && (language === "php" ? next !== "[" : ["bash", "yaml"].includes(language) ? i === 0 || /[\s;|&(]/.test(source[i - 1]) : true)) ||
+        profile.lineComments.some((opening) => source.startsWith(opening, i)) ||
+        (profile.lineStartComments &&
+          !source.slice(source.lastIndexOf("\n", i - 1) + 1, i).trim() &&
+          profile.lineStartComments.some((opening) => source.slice(i, i + opening.length).toLowerCase() === opening && (opening === "::" || /\s|$/.test(source[i + opening.length] || ""))))
       ) {
         type = "comment";
         i = lineEnd(source, i, end);
         if (stop === "php") {
           const close = source.indexOf("?>", begin);
           if (close >= 0 && close < i) i = close;
-        }
-      } else if ((profile.slashComments || profile.blockComments) && char === "/" && next === "*") {
-        type = "comment";
-        i += 2;
-        let nesting = 1;
-        while (i < end && nesting) {
-          if (language === "sql" && source.startsWith("/*", i)) {
-            nesting++;
-            i += 2;
-          } else if (source.startsWith("*/", i)) {
-            nesting--;
-            i += 2;
-          } else i++;
         }
       } else if (language === "php" && source.startsWith("<<<", i)) {
         const opening = source.slice(i).match(/^<<<[ \t]*(['"]?)([A-Za-z_]\w*)\1[ \t]*\r?\n/);
@@ -700,12 +517,16 @@
           type = "operator";
           i += 3;
         }
-      } else if (language === "bash" && source.startsWith("<<", i) && source[i + 2] !== "<") {
-        const opening = source.slice(i).match(/^<<(-?)[ \t]*(['"]?)([A-Za-z_]\w*)\2/);
+      } else if ((language === "bash" || profile.heredoc) && source.startsWith("<<", i) && source[i + 2] !== "<") {
+        const opening = source.slice(i).match(/^<<([-~]?)[ \t]*(['"]?)([A-Za-z_]\w*)\2/);
         if (opening) {
           type = "operator";
           i += opening[0].length;
-          pendingHeredoc.push({ label: opening[3], tabs: opening[1] === "-" });
+          pendingHeredoc.push({
+            label: opening[3],
+            tabs: opening[1] === "-",
+            indent: Boolean(profile.heredoc)
+          });
         } else {
           type = "operator";
           i += 2;
@@ -741,6 +562,16 @@
           if (line.trim() && line.match(/^ */)[0].length <= indent) break;
           i = to < end ? to + 1 : to;
         }
+      } else if (profile.jsx && char === "<" && canRegex && depth < 32 && /^<(?:[A-Za-z][\w.:-]*(?=[\s/>])|>)/.test(source.slice(i))) {
+        i = yield* jsxTokens(source, language, i, end, depth);
+        canRegex = false;
+        continue;
+      } else if (["verilog", "systemverilog"].includes(language) && (char === "'" || /\d/.test(char)) && /^(?:\d[\d_]*)?'[sS]?[bBoOdDhH][\da-fA-F_xXzZ?]+|^'[01xXzZ]/.test(source.slice(i))) {
+        type = "number";
+        i += source.slice(i).match(/^(?:\d[\d_]*)?'[sS]?[bBoOdDhH][\da-fA-F_xXzZ?]+|^'[01xXzZ]/)[0].length;
+      } else if (profile.lifetimes && char === "'" && /^'[A-Za-z_]\w*(?![\w'])/.test(source.slice(i)) && !/^'(?:[^'\\]|\\.)'/.test(source.slice(i))) {
+        type = "variable";
+        i += source.slice(i).match(/^'[A-Za-z_]\w*/)[0].length;
       } else if (profile.templates && char === "`" && depth < 32) {
         let piece = i++;
         while (i < end) {
@@ -755,13 +586,7 @@
           if (source.startsWith("${", i)) {
             yield token("string", source.slice(piece, i));
             yield token("operator", "${");
-            const nested = scriptTokens(source, language, i + 2, end, "brace", depth + 1);
-            let step;
-            do {
-              step = nested.next();
-              if (!step.done) yield step.value;
-            } while (!step.done);
-            i = step.value;
+            i = yield* scriptTokens(source, language, i + 2, end, "brace", depth + 1);
             piece = i;
             continue;
           }
@@ -770,10 +595,13 @@
         if (i > piece) yield token("string", source.slice(piece, i));
         canRegex = false;
         continue;
-      } else if ((char === '"' || char === "'" || (char === "`" && ["php", "bash", "sql", "javascript", "typescript"].includes(language))) && (language !== "yaml" || i === 0 || /[\s:[{,?\-]/.test(source[i - 1]))) {
+      } else if (
+        (char === '"' || (char === "'" && profile.singleQuotes !== false) || (char === "`" && (profile.backticks || ["php", "sql", "javascript", "typescript", "jsx", "tsx"].includes(language)))) &&
+        (language !== "yaml" || i === 0 || /[\s:[{,?\-]/.test(source[i - 1]))
+      ) {
         type = language === "sql" && char !== "'" ? "property" : "string";
         i = quotedEnd(source, i, end, language);
-        if (["json", "yaml"].includes(language) && /^\s*:/.test(source.slice(i))) type = "property";
+        if ((["json", "yaml"].includes(language) || profile.properties) && /^\s*[:=]/.test(source.slice(i))) type = "property";
         canRegex = false;
       } else if (language === "python" && /^[rubf]{1,2}['"]/i.test(source.slice(i))) {
         const prefix = source.slice(i).match(/^[rubf]{1,2}/i)[0];
@@ -806,7 +634,7 @@
           type = "operator";
           canRegex = true;
         }
-      } else if ((["php", "bash"].includes(language) && char === "$") || (language === "yaml" && /[&*!]/.test(char))) {
+      } else if (((["php", "bash"].includes(language) || profile.dollarVariables) && char === "$") || (language === "yaml" && /[&*!]/.test(char)) || (profile.atVariables && char === "@") || (profile.percentVariables && char === "%")) {
         type = "variable";
         i++;
         if (source[i] === "{") {
@@ -817,31 +645,39 @@
             if (source[i] === "}") nested--;
             i++;
           }
-        } else while (i < end && /[\w!?@#*.-]/.test(source[i])) i++;
+        } else while (i < end && /[\w!?@#*.:%-]/.test(source[i])) i++;
         canRegex = false;
       } else if (/\d/.test(char) || (char === "." && /\d/.test(next ?? ""))) {
         const match = source.slice(i).match(/^(?:0[xX][\da-fA-F_]+|0[bB][01_]+|0[oO][0-7_]+|(?:\d[\d_]*(?:\.[\d_]*)?|\.\d[\d_]*)(?:[eE][+-]?[\d_]+)?n?)/);
         i += match?.[0].length || 1;
         type = "number";
         canRegex = false;
-        if (language === "css") while (i < end && /[A-Za-z%]/.test(source[i])) i++;
-      } else if (language === "css" && char === "#" && /^[\da-fA-F]{3,8}\b/.test(source.slice(i + 1))) {
+        if (profile.css) while (i < end && /[A-Za-z%]/.test(source[i])) i++;
+      } else if (profile.css && char === "#" && /^[\da-fA-F]{3,8}\b/.test(source.slice(i + 1))) {
         type = "number";
         i += 1 + source.slice(i + 1).match(/^[\da-fA-F]+/)[0].length;
-      } else if (language === "css" && char === "@") {
+      } else if (profile.css && char === "@") {
         type = "keyword";
         i++;
         while (i < end && /[\w-]/.test(source[i])) i++;
+      } else if ((profile.preprocessor && char === "#") || (profile.annotations && char === "@") || (profile.symbols && char === ":" && /[A-Za-z_]/.test(next || ""))) {
+        type = profile.symbols && char === ":" ? "literal" : "keyword";
+        i++;
+        while (i < end && /[\w.:-]/.test(source[i])) i++;
+      } else if (language === "ini" && char === "[") {
+        type = "property";
+        const close = source.indexOf("]", i + 1);
+        i = close < 0 ? lineEnd(source, i, end) : Math.min(end, close + 1);
       } else if (/[A-Za-z_$\u0080-\uFFFF]/.test(char)) {
         i++;
-        const identifier = ["css", "yaml", "bash"].includes(language) ? /[\w\u0080-\uFFFF-]/ : /[\w$\u0080-\uFFFF]/;
-        while (i < end && identifier.test(source[i])) i++;
+        const identifier = profile.css || profile.hyphenated || ["yaml", "bash"].includes(language) ? /[\w\u0080-\uFFFF-]/ : /[\w$\u0080-\uFFFF]/;
+        while (i < end && (identifier.test(source[i]) || (profile.apostropheIdentifiers && source[i] === "'"))) i++;
         const text = source.slice(begin, i),
           lower = text.toLowerCase();
-        const keyword = language === "sql" || language === "php" ? lower : text;
+        const keyword = profile.caseInsensitive ? lower : text;
         if (profile.keywords.has(keyword)) type = "keyword";
-        else if ((language === "python" ? ["True", "False", "None"] : ["true", "false", "null", "undefined", "NaN", "Infinity"]).includes(text)) type = "literal";
-        else if (["yaml", "css"].includes(language) && /^\s*:/.test(source.slice(i))) type = "property";
+        else if ((profile.literals || ["true", "false", "null", "undefined", "NaN", "Infinity"]).includes(profile.caseInsensitive ? lower : text)) type = "literal";
+        else if ((language === "yaml" || profile.css || profile.properties) && /^\s*[:=]/.test(source.slice(i))) type = "property";
         else if (/^\s*\(/.test(source.slice(i))) type = "function";
         canRegex = ["return", "throw", "case", "delete", "typeof", "void", "new", "in", "of", "yield", "await", "else", "do"].includes(text);
       } else {
@@ -855,6 +691,98 @@
       yield token(type, source.slice(begin, i));
     }
     return i;
+  }
+
+  // JSX text is markup; only braces re-enter the script scanner, with the same recursion bound as templates.
+  function* jsxTokens(source, language, start, end, depth) {
+    let i = start,
+      nesting = 0;
+    while (i < end) {
+      const begin = i;
+      if (source[i] === "{") {
+        yield token("punctuation", "{");
+        i = yield* scriptTokens(source, language, i + 1, end, "brace", depth + 1);
+      } else if (source[i] === "<" && /^<\/?(?:[A-Za-z][\w.:-]*)?(?=[\s/>])/.test(source.slice(i))) {
+        const opening = source.slice(i).match(/^<(\/?)([\w.:-]*)/);
+        i += opening[0].length;
+        yield token("tag", opening[0]);
+        let selfClosing = false;
+        while (i < end) {
+          const from = i;
+          if (source.startsWith("/>", i) || source[i] === ">") {
+            selfClosing = source[i] === "/";
+            i += selfClosing ? 2 : 1;
+            yield token("tag", source.slice(from, i));
+            break;
+          }
+          if (source[i] === "{") {
+            yield token("punctuation", "{");
+            i = yield* scriptTokens(source, language, i + 1, end, "brace", depth + 1);
+          } else if (source[i] === '"' || source[i] === "'") {
+            i = quotedEnd(source, i, end, "html");
+            yield token("string", source.slice(from, i));
+          } else if (/\s/.test(source[i])) {
+            while (i < end && /\s/.test(source[i])) i++;
+            yield token("plain", source.slice(from, i));
+          } else if (source[i] === "=") {
+            yield token("operator", source[i++]);
+          } else {
+            i++;
+            while (i < end && !/[\s={}>'"/]/.test(source[i])) i++;
+            yield token("attribute", source.slice(from, i));
+          }
+        }
+        nesting += opening[1] ? -1 : selfClosing ? 0 : 1;
+        if (nesting <= 0) return i;
+      } else {
+        i++;
+        while (i < end && !/[<{]/.test(source[i])) i++;
+        yield token("plain", source.slice(begin, i));
+      }
+    }
+    return i;
+  }
+
+  function* textTokens(source, language) {
+    let i = 0;
+    while (i < source.length) {
+      const begin = i,
+        end = lineEnd(source, i, source.length);
+      const line = source.slice(i, end);
+      let type = "plain";
+      if (language === "diff") {
+        type = /^(?:@@|diff |index |---|\+\+\+)/.test(line) ? "keyword" : /^\+/.test(line) ? "string" : /^-/.test(line) ? "comment" : "plain";
+      } else if (/^\s*(`{3,}|~{3,})/.test(line)) {
+        const fence = line.match(/^\s*(`{3,}|~{3,})/)[1];
+        i = end < source.length ? end + 1 : end;
+        while (i < source.length) {
+          const to = lineEnd(source, i, source.length),
+            candidate = source.slice(i, to).trim();
+          i = to < source.length ? to + 1 : to;
+          if (candidate[0] === fence[0] && candidate.length >= fence.length && [...candidate].every((char) => char === fence[0])) break;
+        }
+        yield token("string", source.slice(begin, i));
+        continue;
+      } else if (/^\s{0,3}#{1,6}\s|^\s*(?:[-*+] |\d+[.)] |[-*_]{3,}\s*$)/.test(line)) type = "keyword";
+      else if (/^\s*>/.test(line)) type = "comment";
+      else {
+        const parts = /`+[^`\n]*`+|!?\[[^\]\n]*\]\([^\n)]*\)|\*{1,3}[^*\n]+\*{1,3}|~~[^~\n]+~~/g;
+        let position = i,
+          match;
+        while ((match = parts.exec(line))) {
+          const from = begin + match.index;
+          if (from > position) yield token("plain", source.slice(position, from));
+          yield token(match[0][0] === "`" ? "string" : "property", match[0]);
+          position = from + match[0].length;
+        }
+        if (position < end) yield token("plain", source.slice(position, end));
+        if (end < source.length) yield token("plain", "\n");
+        i = end < source.length ? end + 1 : end;
+        continue;
+      }
+      i = end < source.length ? end + 1 : end;
+      yield token(type, source.slice(begin, i));
+    }
   }
 
   // Scan tags and raw script/style regions; embedded source keeps its original character positions.
@@ -1057,7 +985,16 @@
     if (typeof source !== "string") throw new TypeError("Code source must be a string.");
     if (source.length > 2000000 || source.split("\n").length > 20000) throw new RangeError("Code exceeds 2 million characters or 20,000 lines.");
     const name = languageName(language);
-    const iterator = name === "plain" ? [token("plain", source)] : name === "php" ? phpTokens(source) : ["html", "xml"].includes(name) ? markupTokens(source, name) : scriptTokens(source, name);
+    const iterator =
+      name === "plain"
+        ? [token("plain", source)]
+        : name === "php"
+          ? phpTokens(source)
+          : ["html", "xml"].includes(name)
+            ? markupTokens(source, name)
+            : ["markdown", "diff"].includes(name)
+              ? textTokens(source, name)
+              : scriptTokens(source, name);
     let count = 0;
     for (const part of iterator) {
       if (++count > 100000) throw new RangeError("Code exceeds 100,000 lexical tokens.");
@@ -1076,13 +1013,15 @@
     const actions = node("div", "byVIEWactions");
     const selector = node("select");
     selector.setAttribute("aria-label", "Code language");
-    for (const value of byCODEviewer.languages) {
-      const option = node("option", "", value);
-      option.value = value;
-      selector.appendChild(option);
+    if (options.languageSelect !== false) {
+      for (const value of byCODEviewer.languages) {
+        const option = node("option", "", value);
+        option.value = value;
+        selector.appendChild(option);
+      }
+      selector.value = language;
+      actions.appendChild(selector);
     }
-    selector.value = language;
-    if (options.languageSelect !== false) actions.appendChild(selector);
     const wrapLabel = node("label"),
       wrap = node("input");
     wrap.type = "checkbox";

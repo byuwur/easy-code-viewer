@@ -286,6 +286,54 @@ test("CODE standalone browser contracts", async (t) => {
       assert.deepEqual(result.bashComments, ["# end"]);
       assert.deepEqual(result.tsKeywords, ["interface", "readonly", "string", "const"]);
     });
+    await t.test("raw strings, nested comments, hardware numbers and JSX keep lexical boundaries", async () => {
+      const cases = [
+        ["rust", 'r###"a"# /* text */"###', "string"],
+        ["cpp", 'R"note(a) // text " quoted)note"', "string"],
+        ["csharp", '@"C:\\folder\\file ""quoted"""', "string"],
+        ["csharp", '""""three quotes """ // text\nend""""', "string"],
+        ["swift", '##"a"# // text"##', "string"],
+        ["lua", "[=[a]] -- text]=]", "string"],
+        ["lua", "--[==[a]] -- text]==]", "comment"],
+        ["rust", "/* outer /* inner */ tail */", "comment"],
+        ["d", "/+ outer /+ inner +/ tail +/", "comment"],
+        ["kotlin", "/* outer /* inner */ tail */", "comment"],
+        ["haskell", "{- outer {- inner -} tail -}", "comment"],
+        ["ocaml", "(* outer (* inner *) tail *)", "comment"],
+        ["julia", "#= outer #= inner =# tail =#", "comment"],
+        ["nim", "#[ outer #[ inner ]# tail ]#", "comment"],
+        ["powershell", "<# outer # text #>", "comment"],
+        ["powershell", "@'\n# text\n'@", "string"],
+        ["systemverilog", "8'hFF", "number"],
+        ["verilog", "1'b1", "number"]
+      ];
+      const result = await page.evaluate((cases) => cases.map(([language, source]) => [...byCODEviewer.tokenize(source, language)]), cases);
+      cases.forEach(([language, source, type], i) => assert.deepEqual(result[i], [{ type, text: source }], language));
+      const boundaries = await page.evaluate(() => ({
+        d: [...byCODEviewer.tokenize("/* outer /* inner */ auto value = 1;", "d")],
+        functional: ["haskell", "ocaml", "fsharp"].map((language) => [...byCODEviewer.tokenize("let value' = 42", language)].filter((part) => part.type === "string").length),
+        fsharp: [...byCODEviewer.tokenize("/* ordinary operators */", "fsharp")].filter((part) => part.type === "comment").length
+      }));
+      assert.equal(boundaries.d[0].text, "/* outer /* inner */");
+      assert.ok(boundaries.d.some((part) => part.type === "keyword" && part.text === "auto"));
+      assert.deepEqual(boundaries.functional, [0, 0, 0]);
+      assert.equal(boundaries.fsharp, 0);
+      const jsx = await page.evaluate(() => {
+        const source = 'const item = <Box label="if">Text {ready && <b>{count + 1}</b>}</Box>;';
+        const parts = [...byCODEviewer.tokenize(source, "jsx")];
+        const generics = [...byCODEviewer.tokenize("const identity = <T,>(value: T) => value;", "tsx")];
+        return {
+          exact: parts.map((part) => part.text).join("") === source,
+          tags: parts.filter((part) => part.type === "tag").map((part) => part.text),
+          keywords: parts.filter((part) => part.type === "keyword").map((part) => part.text),
+          genericTags: generics.filter((part) => part.type === "tag").length
+        };
+      });
+      assert.equal(jsx.exact, true);
+      assert.ok(jsx.tags.includes("<Box") && jsx.tags.includes("</Box") && jsx.tags.includes("<b"));
+      assert.deepEqual(jsx.keywords, ["const"]);
+      assert.equal(jsx.genericTags, 0);
+    });
     await t.test("language selection, wrapping, line numbers, exact copying, and empty inputs", async () => {
       await page.evaluate(async () => {
         window.codeSource = 'const longName = "' + "text".repeat(100) + '";\r\n';

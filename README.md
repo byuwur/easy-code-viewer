@@ -74,7 +74,7 @@ const fragment = byCODEviewer.highlight(code.textContent, "javascript", { theme:
 code.replaceChildren(fragment);
 ```
 
-`byCODEviewer.languages` is the frozen canonical language-name array. Supported aliases: `js`, `ts`, `htm`, `yml`, `py`, `sh`, `shell`, `text`, and `txt`. Names are case-insensitive. No automatic language detection is attempted.
+`byCODEviewer.languages` is the frozen array of 80 canonical language names. Names and aliases are case-insensitive; surrounding whitespace is ignored. There is no automatic language detection. All languages are built in: no extra script, network lookup, or grammar dependency is needed.
 
 ## Code options
 
@@ -85,24 +85,40 @@ code.replaceChildren(fragment);
 | `lineNumbers`    | `true`    | Show a separate, non-copying line-number gutter.                            |
 | `wordWrap`       | `true`    | Wrap long lines; `false` keeps horizontal scrolling inside the viewer.      |
 
+## Supported languages
+
+| Family | Canonical languages |
+| --- | --- |
+| Web | HTML + CSS + JavaScript (`html`), JavaScript (`javascript`), TypeScript (`typescript`), JSX (`jsx`), TSX (`tsx`), CSS (`css`), SCSS (`scss`), Less (`less`), PHP + HTML (`php`) |
+| Data | XML (`xml`), JSON (`json`), JSON with comments (`jsonc`), JSON5 (`json5`), YAML (`yaml`), SQL (`sql`), GraphQL (`graphql`), Protocol Buffers (`protobuf`) |
+| Scripting | Python (`python`), Ruby (`ruby`), Perl (`perl`), Lua (`lua`) |
+| Shell & build | Bash (`bash`), PowerShell (`powershell`), Windows Batch (`batch`), AWK (`awk`), Dockerfile (`dockerfile`), Makefile (`makefile`), CMake (`cmake`) |
+| Systems | C (`c`), C++ (`cpp`), Go (`go`), Rust (`rust`), Zig (`zig`), D (`d`), Nim (`nim`), Solidity (`solidity`), Assembly (x86) (`assembly`), V (`v`), Odin (`odin`) |
+| Application languages | C# (`csharp`), Java (`java`), Kotlin (`kotlin`), Scala (`scala`), Swift (`swift`), Objective-C (`objectivec`), Dart (`dart`), Groovy (`groovy`), Crystal (`crystal`), GDScript (`gdscript`), GameMaker Language (`gml`) |
+| Scientific | R (`r`), Julia (`julia`), MATLAB (`matlab`), Fortran (`fortran`) |
+| Functional | Haskell (`haskell`), Elixir (`elixir`), Erlang (`erlang`), F# (`fsharp`), OCaml (`ocaml`), Clojure (`clojure`), Common Lisp (`lisp`), Scheme (`scheme`), Racket (`racket`) |
+| Classic | Pascal (`pascal`), COBOL (`cobol`), Visual Basic .NET (`vbnet`), Ada (`ada`) |
+| Hardware & shaders | Verilog (`verilog`), SystemVerilog (`systemverilog`), VHDL (`vhdl`), GLSL (`glsl`), HLSL (`hlsl`), WGSL (`wgsl`) |
+| Configuration | TOML (`toml`), INI (`ini`), Nginx (`nginx`), Terraform / HCL (`hcl`) |
+| Documents | Markdown (`markdown`), Unified diff (`diff`), Plain text (`plain`) |
+
+Common aliases include `js`, `ts`, `htm`, `py`, `sh`, `c++`/`cc`/`cxx`, `c#`/`cs`, `golang`, `rs`, `kt`, `objc`, `rb`, `pl`, `jl`, `ps1`/`pwsh`, `bat`/`cmd`, `hs`, `ex`, `erl`, `f#`/`fs`, `clj`, `ml`, `pas`, `f90`, `vb`, `sol`, `sv`, `vhd`, `frag`/`vert`, `gql`, `proto`, `tf`/`terraform`, `md`, `patch`, `asm`/`nasm`, and `gd`. `text`, `txt`, and `plaintext` select uncolored source. Unknown names also fall back to plain text.
+
 ## Stateful highlighting architecture
 
-The scanner processes original source slices; strings, comments, heredocs, and raw regions take precedence over keywords/operators. Profiles share a script scanner, while markup and PHP composition use separate scanners. JavaScript template expressions recurse within a depth bound.
+Language profiles provide keywords, literals, comment delimiters, quote rules, and common variable/directive forms to the shared scanner. Strings and comments own their contents before keyword matching. Lookup sets are created once; tokenization still yields original source slices lazily, with the existing source/token limits.
 
-Extend a profile when lexical rules fit; use a separate scanner for a different syntax/context boundary.
+Dedicated boundaries handle HTML/XML, PHP inside an HTML host, JSX/TSX markup and brace expressions, Markdown, and unified diffs. JavaScript templates and JSX expressions share a nesting limit of 32. JSX text stays text, while braces return to the JavaScript or TypeScript scanner.
 
-| Stage | Languages | Implemented lexical behavior |
-| --- | --- | --- |
-| 1 | HTML, CSS, JavaScript | Tags/attributes/entities, CSS properties/units/colors/at-rules, comments, strings, numbers, keywords/operators, JS regex literals and nested template expressions. HTML script/style bodies use JS/CSS scanners. |
-| 2 | JSON, XML, YAML | Quoted JSON keys/literals, XML namespaces/comments/CDATA/PI, YAML keys/quotes/anchors/aliases/block scalars. These highlight source without parsing/validating it. |
-| 3 | PHP with HTML/CSS/JS | PHP strings/comments/variables/keywords/heredoc/nowdoc, including server blocks inside host attributes and script/style bodies. PHP regions are lexed, masked while scanning the host, then overlaid without changing source offsets. Snippets without opening tags use the PHP scanner directly. |
-| 4 | SQL, Python, Bash, TypeScript | SQL strings/quoted identifiers/dollar quotes/nested block comments; Python strings/triple strings/prefixes/comments; Bash strings/variables/simple heredocs/comments; TypeScript's additional keywords with JS lexical context. |
+The scanner handles nested comments where applicable, Lua long brackets, Rust and Swift raw strings, C++ delimited raw strings, C# verbatim and variable-length raw strings, triple-quoted strings, Bash/Ruby heredocs, PowerShell here-strings, and Verilog based numbers. These are lexical rules, not compiler grammars. Raw-string boundaries follow the [Rust reference](https://doc.rust-lang.org/reference/tokens.html#raw-string-literals) and [C# reference](https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/tokens/raw-string).
 
 ## Limits and known gaps
 
 Lexical highlighting does not validate or format code. Ambiguous/incomplete syntax may be colored incorrectly; JavaScript regex/division detection uses heuristics.
 
-Unsupported: JSX/TSX, JS decorators, Python f-string expression highlighting, Bash command-substitution parsing and full expansion support, SQL dialect extensions, PHP interpolation in strings, and YAML semantic tag/indent validation. HTML script bodies always use JavaScript regardless of `type`. XML declarations/DTDs are colored as text; CSS selectors have no semantic resolution.
+The added languages provide lexical highlighting, not full parsing, validation, or compilation. Interpolation inside most non-JavaScript strings is colored as part of the string. Advanced macro systems, Ruby/Perl quote operators, MATLAB transpose ambiguity, fixed-column Fortran/COBOL, assembler dialects, and language-specific semantic rules are not resolved. Markdown coloring covers headings, lists, quotes, links, emphasis, inline code, and fenced regions; it does not replace easy-md-viewer.
+
+JS decorators, Python f-string expression highlighting, Bash command-substitution parsing and full expansion support, SQL dialect extensions, PHP interpolation in strings, and YAML semantic validation remain outside the scanner. HTML script bodies use JavaScript regardless of `type`; style bodies use CSS. XML declarations/DTDs are colored as text; CSS selectors have no semantic resolution.
 
 Limits: 2 million source characters, 20,000 LF-delimited display lines, 100,000 lexical tokens, 32 nested JS template-expression scanner levels. Rendering yields while processing token/line chunks and cancels obsolete work; an individual long token or string scan is synchronous. `.highlight()` is synchronous and builds a full fragment, so callers should keep code fences reasonably small.
 
