@@ -7,13 +7,13 @@
  * MIT License (see LICENSE).
  */
 (function (global) {
-  /* --- INITIALIZATION --- */
+  // --- INITIALIZATION ---
   if (global.byCODEviewer?.initialized) return;
 
-  /* --- METADATA --- */
+  // --- METADATA ---
   byCODEviewer.VERSION = "1.6"; // 2026-11-05
 
-  /* --- CONSTANTS --- */
+  // --- CONSTANTS ---
   const javascript = new Set([
     "async",
     "await",
@@ -340,19 +340,19 @@
   const aliases = { js: "javascript", ts: "typescript", htm: "html", yml: "yaml", py: "python", sh: "bash", shell: "bash", text: "plain", txt: "plain" };
   byCODEviewer.languages = Object.freeze(["html", "css", "javascript", "json", "xml", "yaml", "php", "sql", "python", "bash", "typescript", "plain"]);
 
-  /* --- STATE --- */
+  // --- STATE ---
   const instances = new WeakMap();
-  /* --- HELPERS --- */
+  // --- HELPERS ---
   const node = (tag, className = "", text) => {
     const element = document.createElement(tag);
     element.className = className;
     if (text !== undefined) element.textContent = String(text);
     return element;
   };
-  /** Yield at a chunk boundary so input events and replacement renders can run. */
+  // Yield at a chunk boundary so input events and replacement renders can run.
   const pause = () => new Promise((resolve) => setTimeout(resolve, 0));
 
-  /* --- APPEARANCE --- */
+  // --- APPEARANCE ---
   const extraPalettes = new Set([
     "dracula",
     "darcula",
@@ -408,7 +408,7 @@
     console.warn(`easy-code-viewer: Palette "${palette}" requires code.themes.css. Import it after code.css. https://byuwur.github.io/easy-code-viewer/`);
   };
 
-  /** Explicit appearance options override markup; omitted values preserve the container's state. */
+  // Explicit appearance options override markup; omitted values preserve the container's state.
   const applyAppearance = (element, options) => {
     const { theme, palette, fontSize } = options;
     if (theme != null && !["light", "dark"].includes(theme)) throw new RangeError("Theme must be light or dark.");
@@ -429,7 +429,7 @@
     }
   };
 
-  /* --- CONTROLS --- */
+  // --- CONTROLS ---
   // Mirrored across the family so each viewer can run without a shared runtime.
   /**
    * Adds container light/dark controls, retaining legacy stylesheet links as a fallback.
@@ -589,14 +589,14 @@
     });
   };
 
-  /* --- PARSING --- */
-  /** Resolve supported aliases; unknown names deliberately fall back to uncolored source. */
+  // --- PARSING ---
+  // Resolve supported aliases; unknown names deliberately fall back to uncolored source.
   const languageName = (value) => {
     const name = String(value ?? "plain").toLowerCase();
     return aliases[name] || (byCODEviewer.languages.includes(name) ? name : "plain");
   };
   const token = (type, text) => ({ type, text });
-  /** Find a language-specific closing quote without interpreting comment markers inside strings. */
+  // Find a language-specific closing quote without interpreting comment markers inside strings.
   const quotedEnd = (source, start, end, language) => {
     const quote = source[start],
       triple = language === "python" && source.startsWith(quote.repeat(3), start);
@@ -624,7 +624,7 @@
   };
 
   // Tokenization consumes original slices once; strings/comments own their contents before keyword matching.
-  /** Yield original source slices while carrying lexical context across lines and nested templates. */
+  // Yield original source slices while carrying lexical context across lines and nested templates.
   function* scriptTokens(source, language, start = 0, end = source.length, stop = "", depth = 0) {
     const profile = profiles[language];
     let i = start,
@@ -857,7 +857,7 @@
     return i;
   }
 
-  /** Scan tags and raw script/style regions; embedded source keeps its original character positions. */
+  // Scan tags and raw script/style regions; embedded source keeps its original character positions.
   function* markupTokens(source, language) {
     let i = 0;
     while (i < source.length) {
@@ -921,7 +921,7 @@
   }
 
   // PHP is lexed first, then masked in its HTML host. Overlay keeps host strings/tags intact across server blocks.
-  /** Mask PHP regions while scanning the HTML host, then overlay their tokens at the same offsets. */
+  // Mask PHP regions while scanning the HTML host, then overlay their tokens at the same offsets.
   function* phpTokens(source) {
     const regions = [],
       host = [];
@@ -967,7 +967,7 @@
       }
     }
   }
-  /* --- RENDERING --- */
+  // --- RENDERING ---
   const appendToken = (parent, part, text = part.text) => {
     if (part.type === "plain") parent.appendChild(document.createTextNode(text));
     else parent.appendChild(node("span", `byCODEtoken byCODE${part.type}`, text));
@@ -975,9 +975,9 @@
 
   const codeStatus = (source, language, count) => (!source.length ? "No source code." : `${language} \u00b7 ${count} ${count === 1 ? "line" : "lines"}`);
 
-  /* --- LIFECYCLE --- */
+  // --- LIFECYCLE ---
   // One instance owns the container; replacement disposes its pending work first.
-  /** Replace the previous owner and return its cancellable state. Only the current owner may clear the host. */
+  // Replace the previous owner and return its cancellable state. Only the current owner may clear the host.
   const mount = (element, options, getText) => {
     if (!(element instanceof HTMLElement)) throw new TypeError("byCODEviewer: element must be an HTMLElement.");
     applyAppearance(element, options);
@@ -1050,9 +1050,9 @@
     return state;
   };
 
-  /* --- PUBLIC API --- */
+  // --- PUBLIC API ---
   // Yield original slices, including whitespace. Validation runs when the iterator is consumed.
-  /** Return a lazy token stream; input and resource-limit errors occur when iteration advances. */
+  // Return a lazy token stream; input and resource-limit errors occur when iteration advances.
   byCODEviewer.tokenize = function* (source, language) {
     if (typeof source !== "string") throw new TypeError("Code source must be a string.");
     if (source.length > 2000000 || source.split("\n").length > 20000) throw new RangeError("Code exceeds 2 million characters or 20,000 lines.");
@@ -1065,7 +1065,7 @@
     }
   };
 
-  /** Stateful lexical highlighting; source is never interpreted as HTML or executed. */
+  // Stateful lexical highlighting; source is never interpreted as HTML or executed.
   function byCODEviewer(element, source, options = {}) {
     if (source === undefined) source = element?.textContent ?? "";
     if (typeof source !== "string") throw new TypeError("Code source must be a string.");
@@ -1105,7 +1105,7 @@
     };
     syncWrap();
     wrap.addEventListener("change", syncWrap);
-    /* --- RENDERING --- */
+    // --- RENDERING ---
     const render = async () => {
       // A later language selection supersedes any render paused between token chunks.
       const version = ++generation;
@@ -1162,7 +1162,7 @@
     return { ready: state.ready, destroy: state.destroy };
   }
 
-  /** Optional code-block presentation preserves the fragment's exact source text. */
+  // Optional code-block presentation preserves the fragment's exact source text.
   byCODEviewer.highlight = (source, language = "plain", options = {}) => {
     const fragment = document.createDocumentFragment(),
       wrapper = node("span", "byCODEhighlight"),
@@ -1214,7 +1214,7 @@
     fragment.appendChild(wrapper);
     return fragment;
   };
-  /* --- EXPORT --- */
+  // --- EXPORT ---
   global.byCODEviewer = byCODEviewer;
   byCODEviewer.initialized = true;
 })(typeof window !== "undefined" ? window : this);
