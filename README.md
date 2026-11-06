@@ -76,6 +76,8 @@ code.replaceChildren(fragment);
 
 `byCODEviewer.languages` is the frozen array of 80 canonical language names. Names and aliases are case-insensitive; surrounding whitespace is ignored. There is no automatic language detection. All languages are built in: no extra script, network lookup, or grammar dependency is needed.
 
+The playground includes a source sample for every language, using the same canonical names as the viewer's language selector. Selecting a sample never executes its code.
+
 ## Code options
 
 | Option           | Default   | Behavior                                                                    |

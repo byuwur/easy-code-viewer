@@ -82,6 +82,10 @@
             <span class="small font-monospace text-body-secondary me-2">Try it!</span><button type="button" class="feature-chip btn btn-sm font-monospace" data-example="web" aria-pressed="false">HTML + CSS + JS</button
             ><button type="button" class="feature-chip btn btn-sm font-monospace" data-example="php" aria-pressed="false">PHP + HTML</button
             ><button type="button" class="feature-chip btn btn-sm font-monospace" data-example="python" aria-pressed="false">Python</button>
+            <label class="small font-monospace text-body-secondary ms-sm-auto me-1" for="sample-preset">Language demos</label>
+            <select id="sample-preset" class="form-select form-select-sm w-auto mw-100" aria-label="Language sample">
+              <option value="">Choose a sample</option>
+            </select>
           </div>
           <div class="mobile-tabs nav nav-pills d-md-none border-bottom p-2 gap-2 nav-justified bg-body-tertiary small" role="tablist" aria-label="Playground panels">
             <button id="config-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#config-panel" type="button" role="tab" aria-controls="config-panel" aria-selected="false">
@@ -407,15 +411,7 @@
                   spellcheck="false"
                   autocapitalize="off"
                   autocomplete="off"
-                  title="Ctrl / ⌘ + Enter to render. Tab moves focus.">
-// Source stays source.
-const viewer = document.getElementById("viewer");
-const message = `Hello, ${name}!`;
-if (viewer) {
-  console.log(message);
-}
-</textarea
-                >
+                  title="Ctrl / ⌘ + Enter to render. Tab moves focus."></textarea>
               </div>
               <div id="source-status" class="panel-footer text-break border-top px-4 py-2 small font-monospace text-body-secondary" role="status">Edit to render</div>
             </section>
@@ -906,6 +902,91 @@ if (viewer) {
         const themeInputs = [...document.querySelectorAll('[name="previewTheme"]')];
         const error = document.getElementById("source-error");
         const status = document.getElementById("render-status");
+        // prettier-ignore
+        const samples = {
+          default: {"name": "Default showcase", "source": "// Source stays source.\nconst viewer = document.getElementById(\"viewer\");\nconst message = `Hello, ${name}!`;\nif (viewer) {\n  console.log(message);\n}\n"},
+          html: {"name": "HTML + CSS + JavaScript", "group": "Web", "source": "\u003cstyle>\n  .greeting { color: #3a87ad; padding: 1rem; }\n\u003c/style>\n\u003csection class=\"greeting\">Hello, BONYUR &amp; friends!\u003c/section>\n\u003cscript>\n  const message = `Build small, useful things.`;\n  console.log(message);\n\u003c/script>\n"},
+          xml: {"name": "XML", "group": "Data", "source": "\u003c?xml version=\"1.0\"?>\n\u003c!-- Documents stay documents. -->\n\u003ccatalog xmlns:app=\"urn:example\">\n  \u003capp:item id=\"1\" active=\"true\">\n    \u003cname>BONYUR &amp; friends\u003c/name>\n    \u003cnote>\u003c![CDATA[\u003craw text>]]>\u003c/note>\n  \u003c/app:item>\n\u003c/catalog>\n"},
+          javascript: {"name": "JavaScript", "group": "Web", "source": "// Small tools, useful results.\nconst greet = (name = \"BONYUR\") => `Hello, ${name}!`;\nconst pattern = /hello\\s+world/gi;\nasync function main() {\n  const result = await Promise.resolve(greet());\n  console.log(result, pattern.test(\"Hello world\"));\n}\nmain();\n"},
+          typescript: {"name": "TypeScript", "group": "Web", "source": "interface Person { readonly name: string; active?: boolean; }\ntype Greeting = `Hello, ${string}!`;\nconst greet = (person: Person): Greeting => `Hello, ${person.name}!`;\nconst person = { name: \"BONYUR\", active: true } satisfies Person;\nconsole.log(greet(person));\n"},
+          jsx: {"name": "JSX", "group": "Web", "source": "import React from \"react\";\n// Markup and expressions share one source.\nexport function Greeting({ name = \"BONYUR\", count = 3 }) {\n  return \u003csection className=\"greeting\">\n    \u003ch1>Hello, {name}!\u003c/h1>\n    \u003cul>{Array.from({ length: count }, (_, i) => \u003cli key={i}>Idea {i + 1}\u003c/li>)}\u003c/ul>\n  \u003c/section>;\n}\n"},
+          tsx: {"name": "TSX", "group": "Web", "source": "type Props = { name: string; count?: number };\nexport const Greeting = ({ name, count = 3 }: Props) => (\n  \u003csection aria-label={name}>\n    \u003ch1>Hello, {name}!\u003c/h1>\n    \u003cbutton onClick={() => console.log(count)}>Ideas: {count}\u003c/button>\n  \u003c/section>\n);\n"},
+          css: {"name": "CSS", "group": "Web", "source": "/* A small, responsive card. */\n:root { --accent: #3a87ad; }\n.card {\n  color: var(--accent);\n  padding: 1rem;\n  border: 0.0625rem solid currentColor;\n}\n@media (min-width: 40rem) {\n  .card { display: grid; gap: 0.75rem; }\n}\n"},
+          scss: {"name": "SCSS", "group": "Web", "source": "$accent: #3a87ad;\n// Nest only where it helps.\n@mixin card($space: 1rem) { padding: $space; }\n.card {\n  @include card();\n  color: $accent;\n  &:hover { color: lighten($accent, 10%); }\n}\n"},
+          less: {"name": "Less", "group": "Web", "source": "@accent: #3a87ad;\n.rounded(@radius: 0.5rem) { border-radius: @radius; }\n.card {\n  .rounded();\n  padding: 1rem;\n  color: @accent;\n  &:hover { color: lighten(@accent, 10%); }\n}\n"},
+          json: {"name": "JSON", "group": "Data", "source": "{\n  \"project\": \"easy-code-viewer\",\n  \"openSource\": true,\n  \"dependencies\": 0,\n  \"features\": [\"Languages\", \"Themes\", \"Exact copying\"],\n  \"nextIdea\": null\n}\n"},
+          jsonc: {"name": "JSON with comments", "group": "Data", "source": "{\n  // Keep a note beside the setting.\n  \"editor\": {\n    \"theme\": \"monokai\",\n    \"fontSize\": 1.125,\n    \"wordWrap\": true\n  }\n}\n"},
+          json5: {"name": "JSON5", "group": "Data", "source": "{\n  // Friendly configuration.\n  project: 'easy-code-viewer',\n  active: true,\n  scale: 1.25,\n  hexadecimal: 0xFF,\n  values: [1, 2, 3,],\n}\n"},
+          yaml: {"name": "YAML", "group": "Data", "source": "# Small, reusable configuration.\ndefaults: &defaults\n  active: true\n  retries: 3\nservice:\n  \u003c\u003c: *defaults\n  name: easy-code-viewer\n  tags: [small, standalone]\n  notes: |\n    Simple is complicated enough.\n"},
+          php: {"name": "PHP + HTML", "group": "Web", "source": "\u003c?php\n$name = \"BONYUR\";\n$greet = fn(string $value): string => \"Hello, {$value}!\";\n$note = \u003c\u003c\u003cTEXT\nSource stays source.\nTEXT;\n?>\n\u003ch1>\u003c?= htmlspecialchars($greet($name)) ?>\u003c/h1>\n"},
+          sql: {"name": "SQL", "group": "Data", "source": "-- A readable query, with a quoted identifier.\nWITH active_people AS (\n  SELECT id, name FROM people WHERE active = true\n)\nSELECT name AS \"Display name\", COUNT(*) AS total\nFROM active_people\nGROUP BY name\nORDER BY total DESC;\n"},
+          python: {"name": "Python", "group": "Scripting", "source": "from dataclasses import dataclass\n\n@dataclass\nclass Person:\n    name: str\n    active: bool = True\n\ndef greet(person: Person) -> str:\n    \"\"\"Keep the message simple.\"\"\"\n    return f\"Hello, {person.name}!\"\n\nprint(greet(Person(\"BONYUR\")))\n"},
+          bash: {"name": "Bash", "group": "Shell & build", "source": "#!/usr/bin/env bash\nset -euo pipefail\nname=\"${1:-BONYUR}\"\n# Quoted text keeps its contents.\nprintf 'Hello, %s!\\n' \"$name\"\nfor item in small useful independent; do\n  printf -- '- %s\\n' \"$item\"\ndone\ncat \u003c\u003c'NOTE'\nSource stays source.\nNOTE\n"},
+          c: {"name": "C", "group": "Systems", "source": "#include \u003cstdio.h>\n\n/* A small program. */\nint main(void) {\n  const char *name = \"BONYUR\";\n  for (int i = 0; i \u003c 3; ++i) {\n    printf(\"Hello, %s! %d\\n\", name, i + 1);\n  }\n  return 0;\n}\n"},
+          cpp: {"name": "C++", "group": "Systems", "source": "#include \u003ciostream>\n#include \u003cstring_view>\n\nint main() {\n  constexpr std::string_view name = \"BONYUR\";\n  auto note = R\"note(Quotes \"and\" // text stay inside.)note\";\n  std::cout \u003c\u003c \"Hello, \" \u003c\u003c name \u003c\u003c \"!\\n\" \u003c\u003c note;\n}\n"},
+          csharp: {"name": "C#", "group": "Application languages", "source": "using System;\n\nrecord Person(string Name);\nclass Program {\n  static void Main() {\n    var person = new Person(\"BONYUR\");\n    var path = @\"C:\\projects\\viewer\";\n    var note = \"\"\"Quotes \"and\" // text stay inside.\"\"\";\n    Console.WriteLine($\"Hello, {person.Name}! {path} {note}\");\n  }\n}\n"},
+          java: {"name": "Java", "group": "Application languages", "source": "record Person(String name) {}\n\npublic class Main {\n  public static void main(String[] args) {\n    var person = new Person(\"BONYUR\");\n    String note = \"\"\"\n        Source stays source.\n        \"\"\";\n    System.out.println(\"Hello, \" + person.name() + \"! \" + note);\n  }\n}\n"},
+          kotlin: {"name": "Kotlin", "group": "Application languages", "source": "data class Person(val name: String)\n\nfun main() {\n  val person = Person(\"BONYUR\")\n  val note = \"\"\"Quotes \"and\" // text stay inside.\"\"\"\n  println(\"Hello, ${person.name}! $note\")\n}\n"},
+          scala: {"name": "Scala", "group": "Application languages", "source": "case class Person(name: String)\n\nobject Main {\n  def main(args: Array[String]): Unit = {\n    val people = List(Person(\"BONYUR\"), Person(\"Sam\"))\n    people.foreach(person => println(s\"Hello, ${person.name}!\"))\n  }\n}\n"},
+          swift: {"name": "Swift", "group": "Application languages", "source": "struct Person { let name: String }\n\nfunc greet(_ person: Person) -> String {\n  return \"Hello, \\(person.name)!\"\n}\nlet note = #\"Quotes \"and\" // text stay inside.\"#\nprint(greet(Person(name: \"BONYUR\")), note)\n"},
+          objectivec: {"name": "Objective-C", "group": "Application languages", "source": "#import \u003cFoundation/Foundation.h>\n\nint main(int argc, const char *argv[]) {\n  @autoreleasepool {\n    NSString *name = @\"BONYUR\";\n    NSLog(@\"Hello, %@!\", name);\n  }\n  return 0;\n}\n"},
+          go: {"name": "Go", "group": "Systems", "source": "package main\n\nimport \"fmt\"\n\nfunc main() {\n  name := \"BONYUR\"\n  note := `Quotes \"and\" // text stay inside.`\n  for i := 0; i \u003c 3; i++ {\n    fmt.Printf(\"Hello, %s! %d\\n\", name, i + 1)\n  }\n  fmt.Println(note)\n}\n"},
+          rust: {"name": "Rust", "group": "Systems", "source": "fn greet(name: &str) -> String {\n    format!(\"Hello, {name}!\")\n}\n\nfn main() {\n    let note = r##\"Quotes \"and\" // text stay inside.\"##;\n    let names = [\"BONYUR\", \"Sam\"];\n    for name in names { println!(\"{} {note}\", greet(name)); }\n}\n"},
+          zig: {"name": "Zig", "group": "Systems", "source": "const std = @import(\"std\");\n\npub fn main() void {\n    const name = \"BONYUR\";\n    for (0..3) |i| {\n        std.debug.print(\"Hello, {s}! {d}\\n\", .{ name, i + 1 });\n    }\n}\n"},
+          dart: {"name": "Dart", "group": "Application languages", "source": "class Person {\n  final String name;\n  const Person(this.name);\n}\n\nvoid main() {\n  const person = Person(\"BONYUR\");\n  final note = \"\"\"Source stays source.\"\"\";\n  print(\"Hello, ${person.name}! $note\");\n}\n"},
+          d: {"name": "D", "group": "Systems", "source": "import std.stdio;\n\nvoid main() {\n  immutable name = \"BONYUR\";\n  /+ Outer comment /+ nested note +/ done +/\n  auto note = `Quotes \"and\" // text stay inside.`;\n  writeln(\"Hello, \", name, \"! \", note);\n}\n"},
+          groovy: {"name": "Groovy", "group": "Application languages", "source": "class Person { String name }\n\ndef people = [new Person(name: \"BONYUR\"), new Person(name: \"Sam\")]\npeople.each { person ->\n  println \"Hello, ${person.name}!\"\n}\n"},
+          ruby: {"name": "Ruby", "group": "Scripting", "source": "# A small class, a clear greeting.\nclass Person\n  attr_reader :name\n  def initialize(name)\n    @name = name\n  end\n  def greet\n    \"Hello, #{@name}!\"\n  end\nend\nputs Person.new(\"BONYUR\").greet\n"},
+          perl: {"name": "Perl", "group": "Scripting", "source": "use strict;\nuse warnings;\n\nmy @names = (\"BONYUR\", \"Sam\");\nfor my $name (@names) {\n  print \"Hello, $name!\\n\";\n}\n"},
+          lua: {"name": "Lua", "group": "Scripting", "source": "-- Long brackets keep quotes and comments together.\nlocal note = [=[Quotes \"and\" -- text stay inside.]=]\nlocal function greet(name)\n  return \"Hello, \" .. name .. \"!\"\nend\nfor i = 1, 3 do\n  print(greet(\"BONYUR\"), i, note)\nend\n"},
+          r: {"name": "R", "group": "Scientific", "source": "names \u003c- c(\"BONYUR\", \"Sam\", \"Lee\")\nactive \u003c- TRUE\n# Vectorized work, readable output.\ngreet \u003c- function(name) {\n  paste0(\"Hello, \", name, \"!\")\n}\nif (active) print(vapply(names, greet, character(1)))\n"},
+          julia: {"name": "Julia", "group": "Scientific", "source": "struct Person\n    name::String\nend\n\nfunction greet(person::Person)\n    \"Hello, $(person.name)!\"\nend\n#= Outer note #= nested note =# done =#\nprintln(greet(Person(\"BONYUR\")))\n"},
+          matlab: {"name": "MATLAB", "group": "Scientific", "source": "% A small vectorized example.\nfunction message = greet(name)\n    message = \"Hello, \" + name + \"!\";\nend\nvalues = [1, 2, 3, 4];\nsquares = values .^ 2;\ndisp(greet(\"BONYUR\"));\ndisp(squares);\n"},
+          powershell: {"name": "PowerShell", "group": "Shell & build", "source": "param([string]$Name = \"BONYUR\")\n\nfunction Get-Greeting {\n  param([string]$Person)\n  return \"Hello, $Person!\"\n}\n$note = @'\nQuotes \"and\" # text stay inside.\n'@\nWrite-Output (Get-Greeting -Person $Name)\nWrite-Output $note\n"},
+          batch: {"name": "Windows Batch", "group": "Shell & build", "source": "@echo off\nrem A small Windows script.\nset \"NAME=BONYUR\"\nif not \"%~1\"==\"\" set \"NAME=%~1\"\necho Hello, %NAME%!\nfor %%I in (small useful independent) do (\n  echo %%I\n)\n"},
+          awk: {"name": "AWK", "group": "Shell & build", "source": "# Sum the second column.\nBEGIN { FS = \",\"; total = 0 }\nNR > 1 && $1 ~ /active/ { total += $2 }\nEND { printf \"Total: %.2f\\n\", total }\n"},
+          haskell: {"name": "Haskell", "group": "Functional", "source": "module Main where\n\n{- Small functions compose. {- A nested note. -} -}\ngreet :: String -> String\ngreet name = \"Hello, \" ++ name ++ \"!\"\n\nmain :: IO ()\nmain = mapM_ (putStrLn . greet) [\"BONYUR\", \"Sam\"]\n"},
+          elixir: {"name": "Elixir", "group": "Functional", "source": "defmodule Greetings do\n  @moduledoc \"A small greeting module.\"\n  def greet(name) do\n    \"Hello, #{name}!\"\n  end\nend\n\n[\"BONYUR\", \"Sam\"]\n|> Enum.map(&Greetings.greet/1)\n|> Enum.each(&IO.puts/1)\n"},
+          erlang: {"name": "Erlang", "group": "Functional", "source": "-module(greetings).\n-export([greet/1, main/0]).\n\n% Messages stay small.\ngreet(Name) ->\n    io:format(\"Hello, ~s!~n\", [Name]).\n\nmain() ->\n    lists:foreach(fun greet/1, [\"BONYUR\", \"Sam\"]).\n"},
+          fsharp: {"name": "F#", "group": "Functional", "source": "module Greetings\n\ntype Person = { Name: string; Active: bool }\nlet greet person = $\"Hello, {person.Name}!\"\n(* Outer note (* nested note *) done *)\nlet people = [{ Name = \"BONYUR\"; Active = true }]\npeople |> List.filter (fun p -> p.Active) |> List.iter (greet >> printfn \"%s\")\n"},
+          ocaml: {"name": "OCaml", "group": "Functional", "source": "type person = { name : string; active : bool }\n\nlet greet person = \"Hello, \" ^ person.name ^ \"!\"\n(* Outer note (* nested note *) done *)\nlet () =\n  let person = { name = \"BONYUR\"; active = true } in\n  if person.active then print_endline (greet person)\n"},
+          clojure: {"name": "Clojure", "group": "Functional", "source": "(ns greetings)\n\n; Data stays readable.\n(defn greet [person]\n  (str \"Hello, \" (:name person) \"!\"))\n\n(doseq [person [{:name \"BONYUR\" :active true} {:name \"Sam\" :active false}]]\n  (when (:active person)\n    (println (greet person))))\n"},
+          lisp: {"name": "Common Lisp", "group": "Functional", "source": "(defstruct person name active)\n\n(defun greet (person)\n  (format nil \"Hello, ~a!\" (person-name person)))\n\n; Symbols and strings have different jobs.\n(let ((writer (make-person :name \"BONYUR\" :active t)))\n  (when (person-active writer)\n    (write-line (greet writer))))\n"},
+          scheme: {"name": "Scheme", "group": "Functional", "source": "(import (scheme base) (scheme write))\n\n(define (greet name)\n  (string-append \"Hello, \" name \"!\"))\n\n(for-each\n  (lambda (name) (display (greet name)) (newline))\n  '(\"BONYUR\" \"Sam\"))\n"},
+          racket: {"name": "Racket", "group": "Functional", "source": "#lang racket\n\n(define (greet name)\n  (format \"Hello, ~a!\" name))\n\n(for ([name '(\"BONYUR\" \"Sam\")])\n  (displayln (greet name)))\n"},
+          nim: {"name": "Nim", "group": "Systems", "source": "type Person = object\n  name: string\n\nproc greet(person: Person): string =\n  \"Hello, \" & person.name & \"!\"\n\n#[ Outer note #[ nested note ]# done ]#\nlet person = Person(name: \"BONYUR\")\necho greet(person)\n"},
+          crystal: {"name": "Crystal", "group": "Application languages", "source": "record Person, name : String\n\ndef greet(person : Person) : String\n  \"Hello, #{person.name}!\"\nend\n\n# Static types, small source.\nputs greet(Person.new(\"BONYUR\"))\n"},
+          pascal: {"name": "Pascal", "group": "Classic", "source": "program Greetings;\n\nvar\n  Name: String;\n  I: Integer;\nbegin\n  { A small program. }\n  Name := 'BONYUR';\n  for I := 1 to 3 do\n    WriteLn('Hello, ', Name, '! ', I);\nend.\n"},
+          fortran: {"name": "Fortran", "group": "Scientific", "source": "program greetings\n  implicit none\n  integer :: i\n  character(len=*), parameter :: name = \"BONYUR\"\n  ! A small counted loop.\n  do i = 1, 3\n    print *, \"Hello, \", name, \"!\", i\n  end do\nend program greetings\n"},
+          cobol: {"name": "COBOL", "group": "Classic", "source": "       identification division.\n       program-id. greetings.\n       data division.\n       working-storage section.\n       01 person-name pic x(20) value \"BONYUR\".\n       procedure division.\n           *> A small greeting.\n           display \"Hello, \" function trim(person-name) \"!\"\n           stop run.\n"},
+          vbnet: {"name": "Visual Basic .NET", "group": "Classic", "source": "Module Greetings\n  Sub Main()\n    Dim name As String = \"BONYUR\"\n    ' A small counted loop.\n    For i As Integer = 1 To 3\n      Console.WriteLine($\"Hello, {name}! {i}\")\n    Next\n  End Sub\nEnd Module\n"},
+          ada: {"name": "Ada", "group": "Classic", "source": "with Ada.Text_IO; use Ada.Text_IO;\n\nprocedure Greetings is\n   Name : constant String := \"BONYUR\";\nbegin\n   -- A small counted loop.\n   for I in 1 .. 3 loop\n      Put_Line(\"Hello, \" & Name & \"!\" & Integer'Image(I));\n   end loop;\nend Greetings;\n"},
+          solidity: {"name": "Solidity", "group": "Systems", "source": "// SPDX-License-Identifier: MIT\npragma solidity ^0.8.0;\n\ncontract Greetings {\n  string public name = \"BONYUR\";\n  event NameChanged(string value);\n  function rename(string calldata value) external {\n    name = value;\n    emit NameChanged(value);\n  }\n}\n"},
+          verilog: {"name": "Verilog", "group": "Hardware & shaders", "source": "module counter(input wire clk, input wire reset, output reg [7:0] count);\n  // A tiny clocked counter.\n  always @(posedge clk) begin\n    if (reset) count \u003c= 8'd0;\n    else count \u003c= count + 1'b1;\n  end\nendmodule\n"},
+          systemverilog: {"name": "SystemVerilog", "group": "Hardware & shaders", "source": "module counter(input logic clk, input logic reset, output logic [7:0] count);\n  always_ff @(posedge clk) begin\n    if (reset) count \u003c= '0;\n    else count \u003c= count + 1'b1;\n  end\n  assert property (@(posedge clk) reset |=> count == 0);\nendmodule\n"},
+          vhdl: {"name": "VHDL", "group": "Hardware & shaders", "source": "library ieee;\nuse ieee.std_logic_1164.all;\nuse ieee.numeric_std.all;\n\nentity counter is\n  port (clk : in std_logic; count : out unsigned(7 downto 0));\nend entity;\narchitecture rtl of counter is\n  signal value : unsigned(7 downto 0) := (others => '0');\nbegin\n  process(clk) begin\n    if rising_edge(clk) then value \u003c= value + 1; end if;\n  end process;\n  count \u003c= value;\nend architecture;\n"},
+          glsl: {"name": "GLSL", "group": "Hardware & shaders", "source": "#version 330 core\n\nin vec2 uv;\nout vec4 color;\nuniform float time;\n\nvoid main() {\n  vec3 accent = vec3(0.2, 0.6, 0.8);\n  float light = 0.5 + 0.5 * sin(time + uv.x);\n  color = vec4(accent * light, 1.0);\n}\n"},
+          hlsl: {"name": "HLSL", "group": "Hardware & shaders", "source": "cbuffer Scene : register(b0) { float time; };\n\nfloat4 main(float2 uv : TEXCOORD0) : SV_Target {\n  float3 accent = float3(0.2, 0.6, 0.8);\n  float light = 0.5 + 0.5 * sin(time + uv.x);\n  return float4(accent * light, 1.0);\n}\n"},
+          wgsl: {"name": "WGSL", "group": "Hardware & shaders", "source": "struct VertexOutput {\n  @builtin(position) position: vec4\u003cf32>,\n  @location(0) color: vec3\u003cf32>,\n}\n\n@fragment\nfn main(@location(0) color: vec3\u003cf32>) -> @location(0) vec4\u003cf32> {\n  return vec4\u003cf32>(color, 1.0);\n}\n"},
+          graphql: {"name": "GraphQL", "group": "Data", "source": "# Select only the fields you need.\nquery People($active: Boolean = true) {\n  people(active: $active) {\n    id\n    name\n    ...ContactFields\n  }\n}\nfragment ContactFields on Person { email }\n"},
+          protobuf: {"name": "Protocol Buffers", "group": "Data", "source": "syntax = \"proto3\";\npackage greetings;\n\nmessage Person {\n  string name = 1;\n  bool active = 2;\n  repeated string interests = 3;\n}\nservice Greetings {\n  rpc Greet(Person) returns (Person);\n}\n"},
+          toml: {"name": "TOML", "group": "Configuration", "source": "# Small, readable settings.\ntitle = \"easy-code-viewer\"\nactive = true\n\n[appearance]\ntheme = \"monokai\"\nfont_size = 1.125\nnotes = \"\"\"\nSource stays source.\n\"\"\"\n"},
+          ini: {"name": "INI", "group": "Configuration", "source": "; Small, readable settings.\n[viewer]\nname = easy-code-viewer\nactive = true\n\n[appearance]\ntheme = monokai\nfont_size = 1.125\n"},
+          dockerfile: {"name": "Dockerfile", "group": "Shell & build", "source": "# A small static site image.\nFROM nginx:alpine AS runtime\nARG APP_NAME=easy-code-viewer\nENV APP_NAME=$APP_NAME\nCOPY . /usr/share/nginx/html\nEXPOSE 80\nHEALTHCHECK CMD wget -q -O /dev/null http://localhost/ || exit 1\n"},
+          makefile: {"name": "Makefile", "group": "Shell & build", "source": "APP := easy-code-viewer\n.PHONY: check preview\n\n# Keep the workflow direct.\ncheck:\n\tnode --check code.js\n\npreview:\n\t@printf \"Previewing %s\\n\" \"$(APP)\"\n\tpython -m http.server 8080\n"},
+          cmake: {"name": "CMake", "group": "Shell & build", "source": "cmake_minimum_required(VERSION 3.20)\nproject(Greetings LANGUAGES CXX)\n\n# A small C++ executable.\nadd_executable(greetings main.cpp)\ntarget_compile_features(greetings PRIVATE cxx_std_20)\nif(CMAKE_BUILD_TYPE STREQUAL \"Debug\")\n  message(STATUS \"Building ${PROJECT_NAME} for development\")\nendif()\n"},
+          nginx: {"name": "Nginx", "group": "Configuration", "source": "# A small static site.\nserver {\n  listen 8080;\n  server_name localhost;\n  root /var/www/html;\n  index index.html;\n  location / {\n    try_files $uri $uri/ =404;\n  }\n}\n"},
+          hcl: {"name": "Terraform / HCL", "group": "Configuration", "source": "variable \"region\" {\n  type = string\n  default = \"us-east-1\"\n}\n\nprovider \"aws\" { region = var.region }\nresource \"aws_s3_bucket\" \"documents\" {\n  bucket = \"small-useful-documents\"\n  tags = { Project = \"BONYUR\" }\n}\n"},
+          markdown: {"name": "Markdown", "group": "Documents", "source": "# A small document\n\nWrite **something useful**, with *a little emphasis* and `code`.\n\n- Keep the source readable.\n- Let the viewer handle rendering.\n\n> Simple is complicated enough.\n\n[Open the playground](https://byuwur.github.io/easy-code-viewer/)\n\n```javascript\nconst message = \"Hello, BONYUR!\";\n```\n"},
+          diff: {"name": "Unified diff", "group": "Documents", "source": "diff --git a/greeting.js b/greeting.js\n--- a/greeting.js\n+++ b/greeting.js\n@@ -1,2 +1,3 @@\n-const name = \"world\";\n+const name = \"BONYUR\";\n+// Small changes, clear intent.\n console.log(`Hello, ${name}!`);\n"},
+          assembly: {"name": "Assembly (x86)", "group": "Systems", "source": "section .data\n  message db \"Hello, BONYUR!\", 10\n  length equ $ - message\n\nsection .text\n  global _start\n_start:\n  mov rax, 1\n  mov rdi, 1\n  mov rsi, message\n  mov rdx, length\n  syscall\n  mov rax, 60\n  xor rdi, rdi\n  syscall\n"},
+          v: {"name": "V", "group": "Systems", "source": "module main\n\nstruct Person { name string }\n\nfn greet(person Person) string {\n  return 'Hello, ${person.name}!'\n}\nfn main() {\n  println(greet(Person{name: 'BONYUR'}))\n}\n"},
+          odin: {"name": "Odin", "group": "Systems", "source": "package main\n\nimport \"core:fmt\"\n\nPerson :: struct { name: string }\nmain :: proc() {\n  person := Person{name = \"BONYUR\"}\n  for i in 0..\u003c3 {\n    fmt.printf(\"Hello, %s! %d\\n\", person.name, i + 1)\n  }\n}\n"},
+          gdscript: {"name": "GDScript", "group": "Application languages", "source": "extends Node\nclass_name Greetings\n\n@export var person_name: String = \"BONYUR\"\nsignal greeted(message: String)\n\nfunc _ready() -> void:\n    var message := \"Hello, %s!\" % person_name\n    print(message)\n    greeted.emit(message)\n"},
+          gml: {"name": "GameMaker Language", "group": "Application languages", "source": "function greet(_name) {\n  return \"Hello, \" + _name + \"!\";\n}\n\n// A small counted loop.\nvar name = \"BONYUR\";\nfor (var i = 0; i \u003c 3; ++i) {\n  show_debug_message(greet(name));\n}\n"},
+          plain: {"name": "Plain text", "group": "Documents", "source": "A little less noise. A lot more source.\n\nSource stays source: \u003ctags>, \"quotes\", and symbols are text.\nNo automatic language detection. No code execution.\n\nSimple is complicated enough.\n"},
+        };
+        source.value = samples.default.source;
         const initialSource = source.value;
         const initialSecond = second?.value;
         const defaults = {
@@ -1007,6 +1088,15 @@ if (viewer) {
             status.textContent = "Unable to load code.js. Keep the viewer files beside this page.";
             return;
           }
+          const language = form.elements.language;
+          const selectedLanguage = language.value || defaults.language;
+          language.replaceChildren(
+            ...frame.contentWindow.byCODEviewer.languages.map((value) => {
+              const option = new Option(samples[value]?.name || value, value, value === defaults.language);
+              return option;
+            })
+          );
+          language.value = selectedLanguage;
           const viewer = frame.contentDocument.getElementById("viewer");
           new MutationObserver(() => {
             const mode = getPreviewMode(viewer);
@@ -1233,30 +1323,44 @@ if (viewer) {
         document.getElementById("year-txt").textContent = new Date().getFullYear();
 
         // --- EXAMPLES ---
-        const examples = {
-          web: {
-            label: "HTML + CSS + JS",
-            source: '\u003cstyle>.hello { color: #369; }\u003c/style>\n\u003cdiv class="hello">Hello\u003c/div>\n\u003cscript>const message = "Hello"; console.log(message);\u003c/script>',
-            options: { language: "html" }
-          },
-          php: { label: "PHP + HTML", source: '\u003c?php $name = "Andres"; ?>\n\u003ch1>Hello \u003c?= htmlspecialchars($name) ?>\u003c/h1>', options: { language: "php" } },
-          python: { label: "Python", source: 'def greet(name):\n    # Keep it simple.\n    return f"Hello, {name}!"\n\nprint(greet("Andres"))\n', options: { language: "python" } }
-        };
+
+        const samplePicker = document.getElementById("sample-preset");
+        const sampleGroups = new Map();
+        for (const [key, sample] of Object.entries(samples)) {
+          const name = sample.group || "Default";
+          if (!sampleGroups.has(name)) {
+            const group = document.createElement("optgroup");
+            group.label = name;
+            sampleGroups.set(name, group);
+            samplePicker.append(group);
+          }
+          sampleGroups.get(name).append(new Option(sample.name, key));
+        }
+        samplePicker.value = "default";
+        samplePicker.addEventListener("change", () => {
+          const sample = samples[samplePicker.value];
+          if (!sample) return;
+          ++sourceVersion;
+          source.value = sample.source;
+          form.elements.language.value = samplePicker.value === "default" ? defaults.language : samplePicker.value;
+          updateOptions();
+          render();
+          document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", String((button.dataset.example === "web" ? "html" : button.dataset.example) === samplePicker.value)));
+        });
         document.querySelectorAll("[data-example]").forEach((button) =>
           button.addEventListener("click", () => {
-            const example = examples[button.dataset.example];
-            ++sourceVersion;
-            source.value = example.source;
-            if (second) second.value = example.second;
-
-            form.elements.language.value = example.options.language;
-            updateOptions();
-            render();
-            document.querySelectorAll("[data-example]").forEach((choice) => choice.setAttribute("aria-pressed", String(choice === button)));
+            samplePicker.value = button.dataset.example === "web" ? "html" : button.dataset.example;
+            samplePicker.dispatchEvent(new Event("change"));
           })
         );
-        source.addEventListener("input", () => document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", "false")));
-        document.getElementById("reset").addEventListener("click", () => document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", "false")));
+        source.addEventListener("input", () => {
+          samplePicker.value = "";
+          document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", "false"));
+        });
+        document.getElementById("reset").addEventListener("click", () => {
+          samplePicker.value = "default";
+          document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", "false"));
+        });
       });
     </script>
 

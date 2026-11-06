@@ -286,6 +286,87 @@ test("CODE standalone browser contracts", async (t) => {
       assert.deepEqual(result.bashComments, ["# end"]);
       assert.deepEqual(result.tsKeywords, ["interface", "readonly", "string", "const"]);
     });
+    await t.test("every supported language has an exact-source playground demonstration", async () => {
+      const html = require("node:fs").readFileSync(path.join(__dirname, "../index.html"), "utf8");
+      const samples = require("node:vm").runInNewContext(`(${html.match(/const samples = (\{[\s\S]*?^        \});/m)[1]})`);
+      const result = await page.evaluate((samples) => {
+        const languages = byCODEviewer.languages;
+        const failures = [];
+        for (const language of languages) {
+          const sample = samples[language];
+          if (!sample) {
+            failures.push(`${language}: missing demo`);
+            continue;
+          }
+          const tokens = [...byCODEviewer.tokenize(sample.source, language)];
+          if (tokens.map((token) => token.text).join("") !== sample.source) failures.push(`${language}: changed source`);
+          if (language !== "plain" && !tokens.some((token) => token.type !== "plain")) failures.push(`${language}: uncolored demo`);
+          if (byCODEviewer.highlight(sample.source, language).textContent !== sample.source) failures.push(`${language}: changed fragment`);
+        }
+        return { failures, frozen: Object.isFrozen(languages), languages };
+      }, samples);
+      assert.deepEqual(result.failures, []);
+      assert.equal(result.frozen, true);
+      assert.equal(result.languages.length, 80);
+      const hiddenOptions = await page.evaluate(async () => {
+        const createElement = document.createElement;
+        let options = 0;
+        document.createElement = function (name, ...args) {
+          if (name === "option") options++;
+          return createElement.call(this, name, ...args);
+        };
+        try {
+          await byCODEviewer(root, "fn main() {}", { language: "rust", languageSelect: false }).ready;
+          return options;
+        } finally {
+          document.createElement = createElement;
+        }
+      });
+      assert.equal(hiddenOptions, 0, "A hidden language picker must not allocate all language options");
+
+      assert.equal(
+        await page.evaluate(() =>
+          ["constructor", "__proto__", "not-a-language"].every((language) => {
+            const source = "const value = 42;";
+            return JSON.stringify([...byCODEviewer.tokenize(source, language)]) === JSON.stringify([{ type: "plain", text: source }]);
+          })
+        ),
+        true
+      );
+
+      const aliases = {
+        " C++ ": "cpp",
+        cs: "csharp",
+        rs: "rust",
+        kt: "kotlin",
+        golang: "go",
+        rb: "ruby",
+        ps1: "powershell",
+        bat: "batch",
+        hs: "haskell",
+        ex: "elixir",
+        "f#": "fsharp",
+        clj: "clojure",
+        ml: "ocaml",
+        pas: "pascal",
+        f90: "fortran",
+        vb: "vbnet",
+        gql: "graphql",
+        proto: "protobuf",
+        tf: "hcl",
+        md: "markdown",
+        asm: "assembly",
+        gd: "gdscript"
+      };
+      assert.equal(
+        await page.evaluate(
+          ({ aliases, samples }) =>
+            Object.entries(aliases).every(([alias, language]) => JSON.stringify([...byCODEviewer.tokenize(samples[language].source, alias)]) === JSON.stringify([...byCODEviewer.tokenize(samples[language].source, language)])),
+          { aliases, samples }
+        ),
+        true
+      );
+    });
     await t.test("raw strings, nested comments, hardware numbers and JSX keep lexical boundaries", async () => {
       const cases = [
         ["rust", 'r###"a"# /* text */"###', "string"],

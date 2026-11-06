@@ -503,6 +503,23 @@ test("family customization, navigation and monospace controls", async () => {
       assert.equal(await frame.locator("[role=alert]:visible").count(), 0);
       assert.match(await page.locator("#metric-size").textContent(), /B$/);
     }
+    const demoChoices = await page.locator("#sample-preset option").evaluateAll((options) => options.map((option) => option.value).filter(Boolean));
+    const languages = await frame.evaluate(() => [...byCODEviewer.languages]);
+    assert.deepEqual(demoChoices.filter((value) => value !== "default").sort(), [...languages].sort());
+    assert.deepEqual(await page.locator("#language option").evaluateAll((options) => options.map((option) => option.value)), languages);
+    for (const language of languages) {
+      await page.locator("#sample-preset").selectOption(language);
+      await frame.waitForFunction((language) => document.querySelector(".byVIEWstatus")?.textContent.startsWith(`${language} ·`) && document.querySelector("#viewer").getAttribute("aria-busy") === "false", language);
+      assert.equal(await page.locator("#language").inputValue(), language);
+      assert.equal(await frame.locator("[role=alert]:visible").count(), 0, `${language}: demo error`);
+      const original = await page.locator("#source").inputValue();
+      assert.equal(await frame.evaluate(() => [...document.querySelectorAll(".byCODEtext")].map((line) => line.textContent).join("\n")), original, `${language}: rendered demo`);
+    }
+    await page.locator("#sample-preset").selectOption("rust");
+    await page.locator("#reset").click();
+    await page.waitForFunction(() => document.getElementById("render-status").textContent.startsWith("Rendered"));
+    assert.equal(await page.locator("#sample-preset").inputValue(), "default");
+    assert.equal(await page.locator("#language").inputValue(), "javascript");
     const sourceEditor = page.locator("#source");
     const fileSource = await sourceEditor.inputValue();
     await page.evaluate(() => {
