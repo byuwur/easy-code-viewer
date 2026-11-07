@@ -64,6 +64,10 @@ test("suite playground, exports, and stylesheet controls", async () => {
       return route.fulfill({ path: path.join(__dirname, "..", file), contentType: file.endsWith(".html") ? "text/html" : file.endsWith(".js") ? "text/javascript" : "text/css" });
     });
     await page.goto("https://viewer.test/index.html");
+    assert.equal(await page.locator(".playground-toolbar #open-file").count(), 1);
+    assert.equal(await page.locator(".playground-toolbar #sample-preset").count(), 1);
+    assert.equal(await page.locator('[aria-label="CODE examples"] #sample-preset').count(), 0);
+    assert.equal(await page.locator("#reset, #rerun-measurement, #playground > .discovery").count(), 0);
     await page.waitForFunction(() => document.getElementById("render-status").textContent.startsWith("Rendered"));
     const preview = page.frames().find((frame) => frame.parentFrame());
     const source = await page.locator("#source").inputValue();
@@ -236,7 +240,7 @@ test("suite playground, exports, and stylesheet controls", async () => {
     await exported.close();
     await page.locator("#local-file").setInputFiles({ name: "sample.txt", mimeType: "text/plain", buffer: Buffer.from(source) });
     await page.waitForFunction((expected) => document.getElementById("source").value === expected, source);
-    await page.locator("#reset").click();
+    await page.locator("#reset-settings").evaluate((button) => button.click());
     assert.equal(await page.locator('[name="controlsCompact"]').isChecked(), true);
     assert.equal(await page.locator('[name="controlsPosition"]:checked').inputValue(), "top");
     assert.deepEqual(errors, []);
@@ -516,7 +520,7 @@ test("family customization, navigation and monospace controls", async () => {
       assert.equal(await frame.evaluate(() => [...document.querySelectorAll(".byCODEtext")].map((line) => line.textContent).join("\n")), original, `${language}: rendered demo`);
     }
     await page.locator("#sample-preset").selectOption("rust");
-    await page.locator("#reset").click();
+    await page.locator("#sample-preset").selectOption("default");
     await page.waitForFunction(() => document.getElementById("render-status").textContent.startsWith("Rendered"));
     assert.equal(await page.locator("#sample-preset").inputValue(), "default");
     assert.equal(await page.locator("#language").inputValue(), "javascript");
@@ -536,7 +540,7 @@ test("family customization, navigation and monospace controls", async () => {
         await page.locator("#local-file").setInputFiles({ name: "pending.txt", mimeType: "text/plain", buffer: Buffer.from(fileSource) });
         if (action === "edit") await sourceEditor.fill(`${fileSource}\n\n`);
         else if (action === "restore") await page.locator("#restore-source").click();
-        else await page.locator("#reset").click();
+        else await page.locator("#sample-preset").selectOption("default");
         const expected = await sourceEditor.inputValue();
         await page.evaluate((text) => window.finishFileRead(text), "An obsolete file read");
         await page.evaluate(() => new Promise((resolve) => requestAnimationFrame(() => requestAnimationFrame(() => resolve()))));
@@ -549,6 +553,13 @@ test("family customization, navigation and monospace controls", async () => {
         delete window.originalFileText;
       });
     }
+    await page.setViewportSize({ width: 1280, height: 900 });
+    const largeSource = 'const liveValue = "Large live source ' + "x".repeat(70000) + '";';
+    await sourceEditor.fill(largeSource);
+    await frame.waitForFunction(() => document.getElementById("viewer").textContent.includes("Large live source"));
+    await sourceEditor.fill(largeSource.replace("Large live source", "Latest live source"));
+    await frame.waitForFunction(() => document.getElementById("viewer").textContent.includes("Latest live source"));
+    assert.equal(await frame.locator("#viewer").evaluate((element) => element.textContent.includes("Large live source")), false);
     assert.deepEqual(errors, []);
   } finally {
     await browser.close();

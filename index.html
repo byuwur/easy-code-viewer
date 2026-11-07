@@ -69,12 +69,15 @@
         <div class="playground border">
           <div class="playground-toolbar bg-body-tertiary px-4 py-3 border-bottom d-flex flex-wrap align-items-center justify-content-between gap-3">
             <h2 id="playground-title" class="h6 m-0 fw-semibold">Playground</h2>
-            <div class="source-picker">
-              <span id="source-actions-label" class="small font-monospace text-body-secondary d-block mb-1">Sample</span>
-              <div class="d-flex gap-2" role="group" aria-labelledby="source-actions-label">
-                <button id="reset" class="btn btn-outline-secondary fw-semibold flex-fill" type="button"><i class="fa-solid fa-rotate-left me-1" aria-hidden="true"></i> Reset sample</button
-                ><button id="open-file" class="btn btn-outline-secondary fw-semibold flex-fill" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Open file</button><input id="local-file" type="file" hidden="" />
+            <div class="d-flex flex-column flex-sm-row align-items-sm-end justify-content-sm-end gap-3 mw-100">
+              <div class="source-picker">
+                <label class="visually-hidden" for="sample-preset">Sample</label>
+                <select id="sample-preset" class="form-select" aria-label="Language sample">
+                  <option value="">Choose a sample</option>
+                </select>
               </div>
+              <button id="open-file" class="btn btn-outline-secondary fw-semibold flex-shrink-0" type="button"><i class="fa-solid fa-folder-open me-1" aria-hidden="true"></i> Upload your file</button>
+              <input id="local-file" type="file" hidden="" />
             </div>
           </div>
           <div id="source-error" class="alert alert-danger small m-0" role="alert" hidden=""></div>
@@ -82,10 +85,6 @@
             <span class="small font-monospace text-body-secondary me-2">Try it!</span><button type="button" class="feature-chip btn btn-sm font-monospace" data-example="web" aria-pressed="false">HTML + CSS + JS</button
             ><button type="button" class="feature-chip btn btn-sm font-monospace" data-example="php" aria-pressed="false">PHP + HTML</button
             ><button type="button" class="feature-chip btn btn-sm font-monospace" data-example="python" aria-pressed="false">Python</button>
-            <label class="small font-monospace text-body-secondary ms-sm-auto me-1" for="sample-preset">Language demos</label>
-            <select id="sample-preset" class="form-select form-select-sm w-auto mw-100" aria-label="Language sample">
-              <option value="">Choose a sample</option>
-            </select>
           </div>
           <div class="mobile-tabs nav nav-pills d-md-none border-bottom p-2 gap-2 nav-justified bg-body-tertiary small" role="tablist" aria-label="Playground panels">
             <button id="config-tab" class="nav-link" data-bs-toggle="tab" data-bs-target="#config-panel" type="button" role="tab" aria-controls="config-panel" aria-selected="false">
@@ -445,12 +444,6 @@
             </div>
           </dl>
         </div>
-        <div class="discovery py-4 border-bottom d-flex flex-wrap align-items-center gap-2">
-          <span class="small font-monospace text-body-secondary me-2">Try it!</span
-          ><button id="rerun-measurement" class="btn btn-outline-secondary fw-semibold" type="button" title="Includes cooperative rendering delays; excludes browser paint">
-            <i class="fa-solid fa-rotate-right me-1" aria-hidden="true"></i> Rerun measurement
-          </button>
-        </div>
       </section>
       <section id="get-started" class="get-started py-5 row gy-4 gx-lg-5" aria-labelledby="get-started-title">
         <div class="col-lg-3">
@@ -728,7 +721,7 @@
         --by-view-container-bg: #0000;
         border: 0;
         border-radius: 0;
-        height: 28rem;
+        height: 30.8rem;
         white-space: pre-wrap;
         overflow-wrap: anywhere;
       }
@@ -1137,14 +1130,6 @@
             if (previewReady) setPreviewMode(frame.contentDocument.getElementById("viewer"), input.value);
           })
         );
-        document.getElementById("reset").addEventListener("click", () => {
-          ++sourceVersion;
-          source.value = initialSource;
-          if (second) second.value = initialSecond;
-          form.reset();
-          document.querySelector('[name="previewTheme"]:checked').dispatchEvent(new Event("change"));
-          render();
-        });
         document.getElementById("local-file").addEventListener("change", async (event) => {
           const file = event.target.files[0];
           if (!file) return;
@@ -1319,7 +1304,6 @@
             }
           });
         document.getElementById("open-file").addEventListener("click", () => document.getElementById("local-file").click());
-        document.getElementById("rerun-measurement").addEventListener("click", render);
         document.getElementById("year-txt").textContent = new Date().getFullYear();
 
         // --- EXAMPLES ---
@@ -1334,7 +1318,7 @@
             sampleGroups.set(name, group);
             samplePicker.append(group);
           }
-          sampleGroups.get(name).append(new Option(sample.name, key));
+          sampleGroups.get(name).append(new Option(`${sample.name} sample`, key));
         }
         samplePicker.value = "default";
         samplePicker.addEventListener("change", () => {
@@ -1355,10 +1339,6 @@
         );
         source.addEventListener("input", () => {
           samplePicker.value = "";
-          document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", "false"));
-        });
-        document.getElementById("reset").addEventListener("click", () => {
-          samplePicker.value = "default";
           document.querySelectorAll("[data-example]").forEach((button) => button.setAttribute("aria-pressed", "false"));
         });
       });
