@@ -180,6 +180,7 @@
     warnMissingThemes(element, palette ?? element.dataset.theme);
     const size = typeof fontSize === "number" ? `${Math.max(0.5, Math.min(3, fontSize))}rem` : typeof fontSize === "string" ? `clamp(0.5rem, ${fontSize}, 3rem)` : "";
     if (fontSize != null && (typeof fontSize === "number" ? !Number.isFinite(fontSize) : typeof fontSize !== "string" || !CSS.supports("font-size", size))) throw new RangeError("Font size must be a finite multiplier or a CSS size.");
+    // Keep palette identity in data-theme while light/dark classes select its mode.
     if (theme != null || palette != null) {
       const mode = theme ?? (["light", "dark"].includes(element.dataset.theme) ? element.dataset.theme : element.classList.contains("dark") ? "dark" : "light");
       element.classList.toggle("light", mode === "light");
@@ -263,6 +264,7 @@
    * @return {HTMLElement} The text size button group.
    */
   const appendFontSizeControls = (element, controls) => {
+    // Remember the caller's initial size so Reset also works after this toolbar is recreated.
     element.dataset.byViewDefaultFontSize ??= element.style.fontSize;
     const sizes = document.createElement("div");
     sizes.className = "byVIEWfontSizes";
@@ -368,6 +370,7 @@
       quote = source[start];
     const triple = profile.tripleQuotes && source.startsWith(quote.repeat(3), start);
     const delimiter = triple ? quote.repeat(3) : quote;
+    // Raw strings use their language's own terminator rules rather than backslash escaping.
     const raw = (triple && profile.rawTriple) || (quote === "`" && profile.rawBackticks) || (language === "toml" && quote === "'");
     let i = start + delimiter.length;
     for (; i < end; i++) {
@@ -522,6 +525,7 @@
         if (opening) {
           type = "operator";
           i += opening[0].length;
+          // Queue heredoc bodies until the opener's line ends; multiple declarations are consumed in order.
           pendingHeredoc.push({
             label: opening[3],
             tabs: opening[1] === "-",
@@ -679,6 +683,7 @@
         else if ((profile.literals || ["true", "false", "null", "undefined", "NaN", "Infinity"]).includes(profile.caseInsensitive ? lower : text)) type = "literal";
         else if ((language === "yaml" || profile.css || profile.properties) && /^\s*[:=]/.test(source.slice(i))) type = "property";
         else if (/^\s*\(/.test(source.slice(i))) type = "function";
+        // Expression context distinguishes a regex opener from division without a full language parser.
         canRegex = ["return", "throw", "case", "delete", "typeof", "void", "new", "in", "of", "yield", "await", "else", "do"].includes(text);
       } else {
         type = /[{}[\]();,.:]/.test(char) ? "punctuation" : "operator";
@@ -687,6 +692,7 @@
         if (char === "}" && braces > 0) braces--;
         canRegex = !/[)\]}.]/.test(char);
       }
+      // Always consume input, even when a language-specific branch cannot recognize the token.
       if (i <= begin) i = begin + 1;
       yield token(type, source.slice(begin, i));
     }
@@ -908,6 +914,7 @@
   // Replace the previous owner and return its cancellable state. Only the current owner may clear the host.
   const mount = (element, options, getText) => {
     if (!(element instanceof HTMLElement)) throw new TypeError("byCODEviewer: element must be an HTMLElement.");
+    // Validate appearance before disposing the current instance, so invalid options leave it usable.
     applyAppearance(element, options);
     const painted = element.classList.contains("byVIEWready");
     instances.get(element)?.destroy();
@@ -916,6 +923,7 @@
       if (!state.active) return;
       state.active = false;
       cancelAnimationFrame(state.motionFrame);
+      // An old controller must not clear a replacement mounted on the same element.
       if (instances.get(element) === state) {
         instances.delete(element);
         element.replaceChildren();
@@ -1052,6 +1060,7 @@
       try {
         await pause();
         if (!state.active || version !== generation) return false;
+        // Build offscreen and publish only after the final cancellation check to avoid partial stale output.
         const fragment = document.createDocumentFragment();
         let line,
           text,
@@ -1060,6 +1069,7 @@
         const newLine = () => {
           line = node("div", "byCODEline");
           line.dataset.line = String(++lineNumber);
+          // Keep visual line numbers out of source selection and assistive reading.
           if (options.lineNumbers !== false) {
             const number = node("span", "byCODElineNumber", lineNumber);
             number.setAttribute("aria-hidden", "true");
