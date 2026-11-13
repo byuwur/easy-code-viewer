@@ -1,5 +1,5 @@
 /*
- * File: tests/playground.cjs
+ * File: __tests__/playground.cjs
  * Desc: CODE playground configuration, previews, and exports; library checks live in rendering.cjs.
  */
 
