@@ -169,7 +169,8 @@
     const document = element.ownerDocument;
     if (document.defaultView.getComputedStyle(document.documentElement).getPropertyValue("--by-code-themes-loaded").trim() === "1") return;
     warnedPalettes.add(palette);
-    console.warn(`easy-code-viewer: Palette "${palette}" requires code.themes.css. Import it after code.css. https://byuwur.github.io/easy-code-viewer/`);
+    // console.warn(`easy-code-viewer: Palette "${palette}" requires code.themes.css. Import it after code.css. https://byuwur.github.io/easy-code-viewer/`);
+    console.warn(`easy-code-viewer: Palette "${palette}" requires code.themes.css. Import it after code.css. https://code.byuwur.co/`);
   };
 
   // Explicit appearance options override markup; omitted values preserve the container's state.

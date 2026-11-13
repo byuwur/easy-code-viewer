@@ -8,16 +8,20 @@
     <meta name="author" content="Andrés Trujillo [Mateus] byUwUr" />
     <meta name="robots" content="index, follow, max-image-preview:large" />
     <meta name="theme-color" content="#141618" />
-    <link rel="canonical" href="https://byuwur.github.io/easy-code-viewer/" />
-    <link rel="icon" type="image/png" href="https://byuwur.github.io/easy-code-viewer/assets/favicon.png" />
+    <!-- <link rel="canonical" href="https://byuwur.github.io/easy-code-viewer/" /> -->
+    <link rel="canonical" href="https://code.byuwur.co/" />
+    <!-- <link rel="icon" type="image/png" href="https://byuwur.github.io/easy-code-viewer/assets/favicon.png" /> -->
+    <link rel="icon" type="image/png" href="./assets/favicon.png" />
     <!-- SEO -->
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content="easy-code-viewer" />
     <meta property="og:locale" content="en_US" />
     <meta property="og:title" content="easy-code-viewer | Source code, let syntax speak." />
     <meta property="og:description" content="Highlight source code with language selection, line numbers, word wrapping, and copy controls. A free JavaScript code viewer by BONYUR." />
-    <meta property="og:url" content="https://byuwur.github.io/easy-code-viewer/" />
-    <meta property="og:image" content="https://byuwur.github.io/easy-code-viewer/prev.jpg" />
+    <!-- <meta property="og:url" content="https://byuwur.github.io/easy-code-viewer/" /> -->
+    <meta property="og:url" content="https://code.byuwur.co/" />
+    <!-- <meta property="og:image" content="https://byuwur.github.io/easy-code-viewer/prev.jpg" /> -->
+    <meta property="og:image" content="https://code.byuwur.co/prev.jpg" />
     <meta property="og:image:type" content="image/jpeg" />
     <meta property="og:image:width" content="1920" />
     <meta property="og:image:height" content="1076" />
@@ -26,7 +30,8 @@
     <meta name="twitter:creator" content="@byUwUr" />
     <meta name="twitter:title" content="easy-code-viewer | Source code, let syntax speak." />
     <meta name="twitter:description" content="Highlight source code with language selection, line numbers, word wrapping, and copy controls. A free JavaScript code viewer by BONYUR." />
-    <meta name="twitter:image" content="https://byuwur.github.io/easy-code-viewer/prev.jpg" />
+    <!-- <meta name="twitter:image" content="https://byuwur.github.io/easy-code-viewer/prev.jpg" /> -->
+    <meta name="twitter:image" content="https://code.byuwur.co/prev.jpg" />
     <meta name="twitter:image:alt" content="easy-code-viewer by BONYUR: Source code playground, options, source editor, and live preview." />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/shards.min.css" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/gh/byuwur/spa.js@v20.7/css/bootstrap.min.css" />
@@ -477,39 +482,48 @@
     <nav class="viewer-suite site-width py-4 container-fluid" aria-label="Viewer suite">
       <p class="small text-body-secondary mb-3">Need another format, maybe an editor?</p>
       <div class="d-flex flex-wrap align-items-center gap-3">
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-md-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-md-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://md.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #d8cdf5; --logo-dark: #c4b5fd" aria-hidden="true">md↓</span>
           <span class="text-decoration-underline">MD</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-md-editor/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-md-editor/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://mdedit.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #d8cdf5; --logo-dark: #c4b5fd" aria-hidden="true">md↑</span>
           <span class="text-decoration-underline">MD.edit</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-code-viewer/" aria-current="page">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-code-viewer/" aria-current="page"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="./" aria-current="page">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #cad8f4; --logo-dark: #aec5ef" aria-hidden="true">{ }</span>
           <span class="text-decoration-underline">CODE</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-json-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-json-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://json.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #f3e4b4; --logo-dark: #f2d98d" aria-hidden="true">{ }</span>
           <span class="text-decoration-underline">JSON</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-csv-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-csv-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://csv.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #c0dfca; --logo-dark: #a9d6b8" aria-hidden="true">csv</span>
           <span class="text-decoration-underline">CSV</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-diff-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-diff-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://diff.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #f4c7cf; --logo-dark: #eeadb8" aria-hidden="true">±</span>
           <span class="text-decoration-underline">DIFF</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-log-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-log-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://log.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #f6d2bd; --logo-dark: #f3bfa0" aria-hidden="true">log</span>
           <span class="text-decoration-underline">LOG</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-xml-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-xml-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://xml.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #c0e2ee; --logo-dark: #a3d5e8" aria-hidden="true">&lt;/&gt;</span>
           <span class="text-decoration-underline">XML</span>
         </a>
-        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-yaml-viewer/">
+        <!-- <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://byuwur.github.io/easy-yaml-viewer/"> -->
+        <a class="small font-monospace link-body-emphasis link-offset-2 text-decoration-none d-inline-flex align-items-center gap-2 py-1" href="https://yaml.byuwur.co/">
           <span class="brand-mark d-inline-flex align-items-center justify-content-center fw-bold" style="--logo-light: #e5cce3; --logo-dark: #dab6d7" aria-hidden="true">yml</span>
           <span class="text-decoration-underline">YAML</span>
         </a>
@@ -970,7 +984,8 @@
           cmake: {"name": "CMake", "group": "Shell & build", "source": "cmake_minimum_required(VERSION 3.20)\nproject(Greetings LANGUAGES CXX)\n\n# A small C++ executable.\nadd_executable(greetings main.cpp)\ntarget_compile_features(greetings PRIVATE cxx_std_20)\nif(CMAKE_BUILD_TYPE STREQUAL \"Debug\")\n  message(STATUS \"Building ${PROJECT_NAME} for development\")\nendif()\n"},
           nginx: {"name": "Nginx", "group": "Configuration", "source": "# A small static site.\nserver {\n  listen 8080;\n  server_name localhost;\n  root /var/www/html;\n  index index.html;\n  location / {\n    try_files $uri $uri/ =404;\n  }\n}\n"},
           hcl: {"name": "Terraform / HCL", "group": "Configuration", "source": "variable \"region\" {\n  type = string\n  default = \"us-east-1\"\n}\n\nprovider \"aws\" { region = var.region }\nresource \"aws_s3_bucket\" \"documents\" {\n  bucket = \"small-useful-documents\"\n  tags = { Project = \"BONYUR\" }\n}\n"},
-          markdown: {"name": "Markdown", "group": "Documents", "source": "# A small document\n\nWrite **something useful**, with *a little emphasis* and `code`.\n\n- Keep the source readable.\n- Let the viewer handle rendering.\n\n> Simple is complicated enough.\n\n[Open the playground](https://byuwur.github.io/easy-code-viewer/)\n\n```javascript\nconst message = \"Hello, BONYUR!\";\n```\n"},
+          // markdown: {"name": "Markdown", "group": "Documents", "source": "# A small document\n\nWrite **something useful**, with *a little emphasis* and `code`.\n\n- Keep the source readable.\n- Let the viewer handle rendering.\n\n> Simple is complicated enough.\n\n[Open the playground](https://byuwur.github.io/easy-code-viewer/)\n\n```javascript\nconst message = \"Hello, BONYUR!\";\n```\n"},
+          markdown: {"name": "Markdown", "group": "Documents", "source": "# A small document\n\nWrite **something useful**, with *a little emphasis* and `code`.\n\n- Keep the source readable.\n- Let the viewer handle rendering.\n\n> Simple is complicated enough.\n\n[Open the playground](https://code.byuwur.co/)\n\n```javascript\nconst message = \"Hello, BONYUR!\";\n```\n"},
           diff: {"name": "Unified diff", "group": "Documents", "source": "diff --git a/greeting.js b/greeting.js\n--- a/greeting.js\n+++ b/greeting.js\n@@ -1,2 +1,3 @@\n-const name = \"world\";\n+const name = \"BONYUR\";\n+// Small changes, clear intent.\n console.log(`Hello, ${name}!`);\n"},
           assembly: {"name": "Assembly (x86)", "group": "Systems", "source": "section .data\n  message db \"Hello, BONYUR!\", 10\n  length equ $ - message\n\nsection .text\n  global _start\n_start:\n  mov rax, 1\n  mov rdi, 1\n  mov rsi, message\n  mov rdx, length\n  syscall\n  mov rax, 60\n  xor rdi, rdi\n  syscall\n"},
           v: {"name": "V", "group": "Systems", "source": "module main\n\nstruct Person { name string }\n\nfn greet(person Person) string {\n  return 'Hello, ${person.name}!'\n}\nfn main() {\n  println(greet(Person{name: 'BONYUR'}))\n}\n"},
